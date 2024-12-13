@@ -1,5 +1,8 @@
 package org.example.catalog.unit.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.catalog.entity.Product;
 import org.example.catalog.repository.ProductRepository;
@@ -8,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
 
@@ -27,6 +31,9 @@ public class ProductServiceKafkaNotificationTest {
 
     @Mock
     private KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @InjectMocks
     private ProductServiceKafkaNotification cut;
@@ -79,8 +86,13 @@ public class ProductServiceKafkaNotificationTest {
     }
 
     @Test
-    public void add() {
+    public void add() throws JsonProcessingException {
         final Product mockedProduct = getProduct();
+        final ObjectWriter objectWriter = Mockito.mock(ObjectWriter.class);
+
+        when(objectMapper.writer()).thenReturn(objectWriter);
+        when(objectWriter.withDefaultPrettyPrinter()).thenReturn(objectWriter);
+        when(objectWriter.writeValueAsString(any())).thenReturn("json");
 
         when(productRepository.save(mockedProduct)).thenReturn(mockedProduct);
 
@@ -93,7 +105,7 @@ public class ProductServiceKafkaNotificationTest {
 
         verify(productRepository, times(1)).save(mockedProduct);
         verify(kafkaTemplate, times(1))
-                .send(eq("product-events"), any());
+                .send("product-events", "json");
     }
 
     private List<Product> getProducts() {

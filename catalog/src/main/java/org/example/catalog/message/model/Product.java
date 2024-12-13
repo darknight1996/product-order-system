@@ -1,6 +1,5 @@
-package org.example.message.model;
+package org.example.catalog.message.model;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class Product {

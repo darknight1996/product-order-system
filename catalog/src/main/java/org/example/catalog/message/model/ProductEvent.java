@@ -1,9 +1,4 @@
-package org.example.message;
-
-import org.example.message.model.ActionType;
-import org.example.message.model.Product;
-
-import java.io.Serializable;
+package org.example.catalog.message.model;
 
 public class ProductEvent {
 
@@ -32,7 +27,7 @@ public class ProductEvent {
         return product;
     }
 
-    public void setProduct(Product product) {
+    public void setProduct(final Product product) {
         this.product = product;
     }
 
@@ -40,7 +35,7 @@ public class ProductEvent {
         return actionType;
     }
 
-    public void setActionType(ActionType actionType) {
+    public void setActionType(final ActionType actionType) {
         this.actionType = actionType;
     }
 

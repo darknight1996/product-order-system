@@ -1,11 +1,14 @@
 package org.example.catalog.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.catalog.entity.Product;
+import org.example.catalog.message.model.ActionType;
+import org.example.catalog.message.model.ProductEvent;
 import org.example.catalog.repository.ProductRepository;
 import org.example.catalog.service.ProductService;
-import org.example.message.ProductEvent;
-import org.example.message.model.ActionType;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +22,14 @@ public class ProductServiceKafkaNotification implements ProductService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
+    private final ObjectMapper objectMapper;
+
     public ProductServiceKafkaNotification(final ProductRepository productRepository,
-                                           final KafkaTemplate<String, Object> kafkaTemplate) {
+                                           final KafkaTemplate<String, Object> kafkaTemplate,
+                                           final ObjectMapper objectMapper) {
         this.productRepository = productRepository;
         this.kafkaTemplate = kafkaTemplate;
-
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -87,7 +93,15 @@ public class ProductServiceKafkaNotification implements ProductService {
     }
 
     private void sendMessage(final ProductEvent productEvent) {
-        kafkaTemplate.send("product-events", productEvent);
+        final ObjectWriter objectWriter = objectMapper.writer().withDefaultPrettyPrinter();
+
+        try {
+            final String jsonContent = objectWriter.writeValueAsString(productEvent);
+            kafkaTemplate.send("product-events", jsonContent);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 }

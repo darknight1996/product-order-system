@@ -1,12 +1,14 @@
 package org.example.inventory.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.example.inventory.entity.Inventory;
+import org.example.inventory.message.model.ActionType;
+import org.example.inventory.message.model.Product;
+import org.example.inventory.message.model.ProductEvent;
 import org.example.inventory.repository.InventoryRepository;
 import org.example.inventory.service.InventoryService;
-import org.example.message.ProductEvent;
-import org.example.message.model.ActionType;
-import org.example.message.model.Product;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +20,12 @@ public class InventoryServiceKafkaNotification implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
 
-    public InventoryServiceKafkaNotification(final InventoryRepository inventoryRepository) {
+    private final ObjectMapper objectMapper;
+
+    public InventoryServiceKafkaNotification(final InventoryRepository inventoryRepository,
+                                             final ObjectMapper objectMapper) {
         this.inventoryRepository = inventoryRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -29,14 +35,20 @@ public class InventoryServiceKafkaNotification implements InventoryService {
 
     @KafkaListener(topics = "product-events", groupId = "inventory-consumer-group")
     @Transactional
-    public void productDelete(final ProductEvent productEvent) {
-        final ActionType actionType = productEvent.getActionType();
-        final Product product = productEvent.getProduct();
+    public void productEvent(final String productEventJson) {
+        try {
+            final ProductEvent productEvent = objectMapper.readValue(productEventJson, ProductEvent.class);
 
-        switch (actionType) {
-            case ADD -> add(product);
-            case DELETE -> delete(product);
-            case UPDATE -> update(product);
+            final ActionType actionType = productEvent.getActionType();
+            final Product product = productEvent.getProduct();
+
+            switch (actionType) {
+                case ADD -> add(product);
+                case DELETE -> delete(product);
+                case UPDATE -> update(product);
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
