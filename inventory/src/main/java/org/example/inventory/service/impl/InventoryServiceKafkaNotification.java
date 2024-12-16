@@ -1,7 +1,5 @@
 package org.example.inventory.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.example.inventory.entity.Inventory;
 import org.example.inventory.repository.InventoryRepository;
@@ -20,12 +18,8 @@ public class InventoryServiceKafkaNotification implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
 
-    private final ObjectMapper objectMapper;
-
-    public InventoryServiceKafkaNotification(final InventoryRepository inventoryRepository,
-                                             final ObjectMapper objectMapper) {
+    public InventoryServiceKafkaNotification(final InventoryRepository inventoryRepository) {
         this.inventoryRepository = inventoryRepository;
-        this.objectMapper = objectMapper;
     }
 
     @Override
