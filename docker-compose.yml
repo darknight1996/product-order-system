@@ -25,26 +25,26 @@ services:
 
   catalog:
     build:
-      context: ./catalog
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./catalog/Dockerfile
     container_name: catalog
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: docker
-      KAFKA_BROKER: kafka:9092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS:
+        kafka:9092
     depends_on:
       - kafka
 
   inventory:
     build:
-      context: ./inventory
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./inventory/Dockerfile
     container_name: inventory
     ports:
       - "8082:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: docker
-      KAFKA_BROKER: kafka:9092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS:
+        kafka:9092
     depends_on:
       - kafka

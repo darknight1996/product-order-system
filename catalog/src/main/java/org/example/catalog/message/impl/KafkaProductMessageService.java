@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.example.catalog.entity.Product;
 import org.example.catalog.message.ProductMessageService;
-import org.example.catalog.message.model.ActionType;
-import org.example.catalog.message.model.ProductEvent;
+import org.example.message.ActionType;
+import org.example.message.ProductEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,24 +23,33 @@ public class KafkaProductMessageService implements ProductMessageService {
     }
 
     @Override
-    public void sendAdd(Product product) {
-        final ProductEvent productEvent = new ProductEvent(product, ActionType.ADD);
+    public void sendAdd(final Product product) {
+        final ProductEvent productEvent = createProductEvent(product, ActionType.ADD);
 
         sendMessage(productEvent);
     }
 
     @Override
-    public void sendDelete(Product product) {
-        final ProductEvent productEvent = new ProductEvent(product, ActionType.DELETE);
+    public void sendDelete(final Product product) {
+        final ProductEvent productEvent = createProductEvent(product, ActionType.DELETE);
 
         sendMessage(productEvent);
     }
 
     @Override
-    public void sendUpdate(Product product) {
-        final ProductEvent productEvent = new ProductEvent(product, ActionType.UPDATE);
+    public void sendUpdate(final Product product) {
+        final ProductEvent productEvent = createProductEvent(product, ActionType.UPDATE);
 
         sendMessage(productEvent);
+    }
+
+    private ProductEvent createProductEvent(final Product product, final ActionType actionType) {
+        return new ProductEvent(
+                product.getId(),
+                product.getName(),
+                product.getPrice(),
+                actionType
+        );
     }
 
     private void sendMessage(final ProductEvent productEvent) {

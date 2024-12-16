@@ -1,4 +1,4 @@
-package org.example.inventory.message.model;
+package org.example.message;
 
 import java.math.BigDecimal;
 

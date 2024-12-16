@@ -4,11 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.example.inventory.entity.Inventory;
-import org.example.inventory.message.model.ActionType;
-import org.example.inventory.message.model.Product;
-import org.example.inventory.message.model.ProductEvent;
 import org.example.inventory.repository.InventoryRepository;
 import org.example.inventory.service.InventoryService;
+import org.example.message.ActionType;
+import org.example.message.Product;
+import org.example.message.ProductEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 

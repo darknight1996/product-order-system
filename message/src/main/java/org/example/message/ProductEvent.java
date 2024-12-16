@@ -1,4 +1,6 @@
-package org.example.catalog.message.model;
+package org.example.message;
+
+import java.math.BigDecimal;
 
 public class ProductEvent {
 
@@ -9,17 +11,14 @@ public class ProductEvent {
     public ProductEvent() {
     }
 
-    public ProductEvent(final org.example.catalog.entity.Product product, final ActionType actionType) {
-        this.product = new Product();
-        this.product.setId(product.getId());
-        this.product.setName(product.getName());
-        this.product.setPrice(product.getPrice());
-
+    public ProductEvent(final Product product, final ActionType actionType) {
+        this.product = product;
         this.actionType = actionType;
     }
 
-    public ProductEvent(final Product product, final ActionType actionType) {
-        this.product = product;
+    public ProductEvent(final Long productId, final String productName, final BigDecimal productPrice,
+                        final ActionType actionType) {
+        this.product = new Product(productId, productName, productPrice);
         this.actionType = actionType;
     }
 
