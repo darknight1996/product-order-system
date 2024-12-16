@@ -35,20 +35,14 @@ public class InventoryServiceKafkaNotification implements InventoryService {
 
     @KafkaListener(topics = "product-events", groupId = "inventory-consumer-group")
     @Transactional
-    public void productEvent(final String productEventJson) {
-        try {
-            final ProductEvent productEvent = objectMapper.readValue(productEventJson, ProductEvent.class);
+    public void productEvent(final ProductEvent productEvent) {
+        final ActionType actionType = productEvent.getActionType();
+        final Product product = productEvent.getProduct();
 
-            final ActionType actionType = productEvent.getActionType();
-            final Product product = productEvent.getProduct();
-
-            switch (actionType) {
-                case ADD -> add(product);
-                case DELETE -> delete(product);
-                case UPDATE -> update(product);
-            }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        switch (actionType) {
+            case ADD -> add(product);
+            case DELETE -> delete(product);
+            case UPDATE -> update(product);
         }
     }
 

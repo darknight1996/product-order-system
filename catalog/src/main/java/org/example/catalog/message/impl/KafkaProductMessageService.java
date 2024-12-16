@@ -1,8 +1,5 @@
 package org.example.catalog.message.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.example.catalog.entity.Product;
 import org.example.catalog.message.ProductMessageService;
 import org.example.message.ActionType;
@@ -13,13 +10,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class KafkaProductMessageService implements ProductMessageService {
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper;
+    private final KafkaTemplate<String, ProductEvent> kafkaTemplate;
 
-    public KafkaProductMessageService(final KafkaTemplate<String, String> kafkaTemplate,
-                                      final ObjectMapper objectMapper) {
+    public KafkaProductMessageService(final KafkaTemplate<String, ProductEvent> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
-        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -53,14 +47,7 @@ public class KafkaProductMessageService implements ProductMessageService {
     }
 
     private void sendMessage(final ProductEvent productEvent) {
-        final ObjectWriter objectWriter = objectMapper.writer().withDefaultPrettyPrinter();
-
-        try {
-            final String jsonContent = objectWriter.writeValueAsString(productEvent);
-            kafkaTemplate.send("product-events", jsonContent);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        kafkaTemplate.send("product-events", productEvent);
     }
 
 }
