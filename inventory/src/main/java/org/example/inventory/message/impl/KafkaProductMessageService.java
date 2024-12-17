@@ -1,34 +1,29 @@
-package org.example.inventory.service.impl;
+package org.example.inventory.message.impl;
 
 import jakarta.transaction.Transactional;
 import org.example.inventory.entity.Inventory;
+import org.example.inventory.message.ProductMessageService;
 import org.example.inventory.repository.InventoryRepository;
-import org.example.inventory.service.InventoryService;
 import org.example.message.ActionType;
 import org.example.message.Product;
 import org.example.message.ProductEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
-public class InventoryServiceKafkaNotification implements InventoryService {
+public class KafkaProductMessageService implements ProductMessageService {
 
     private final InventoryRepository inventoryRepository;
 
-    public InventoryServiceKafkaNotification(final InventoryRepository inventoryRepository) {
+    public KafkaProductMessageService(final InventoryRepository inventoryRepository) {
         this.inventoryRepository = inventoryRepository;
     }
 
     @Override
-    public List<Inventory> getAll() {
-        return inventoryRepository.findAll();
-    }
-
-    @KafkaListener(topics = "product-events", groupId = "inventory-consumer-group")
     @Transactional
+    @KafkaListener(topics = "product-events", groupId = "inventory-consumer-group")
     public void productEvent(final ProductEvent productEvent) {
         final ActionType actionType = productEvent.getActionType();
         final Product product = productEvent.getProduct();
@@ -66,6 +61,8 @@ public class InventoryServiceKafkaNotification implements InventoryService {
 
             inventory.setProductName(product.getName());
             inventory.setProductPrice(product.getPrice());
+
+            inventoryRepository.save(inventory);
         }
     }
 

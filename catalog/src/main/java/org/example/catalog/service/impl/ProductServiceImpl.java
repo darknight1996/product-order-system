@@ -31,6 +31,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product getById(final Long id) {
         final Optional<Product> productOptional = productRepository.findById(id);
+
         return productOptional.orElseThrow(() -> new EntityNotFoundException("Product not found"));
     }
 

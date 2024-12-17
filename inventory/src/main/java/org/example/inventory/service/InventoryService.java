@@ -9,4 +9,13 @@ import java.util.List;
 public interface InventoryService {
 
     List<Inventory> getAll();
+
+    Inventory getById(final Long id);
+
+    Inventory add(final Inventory inventory);
+
+    void delete(final Long id);
+
+    Inventory update(final Inventory inventory);
+
 }
