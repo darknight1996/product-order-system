@@ -1,6 +1,5 @@
 package org.example.catalog.unit.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.catalog.entity.Product;
 import org.example.catalog.message.ProductMessageService;
@@ -33,7 +32,7 @@ public class ProductServiceImplTest {
     private ProductServiceImpl cut;
 
     @Test
-    public void getAll() {
+    public void getAll_success() {
         final List<Product> mockedProducts = getProducts();
 
         when(productRepository.findAll()).thenReturn(mockedProducts);
@@ -57,7 +56,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void getById_productExists() {
+    public void getById_success() {
         final Product mockedProduct = getProduct();
 
         when(productRepository.findById(mockedProduct.getId())).thenReturn(Optional.of(mockedProduct));
@@ -80,7 +79,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void add() {
+    public void add_success() {
         final Product mockedProduct = getProduct();
 
         when(productRepository.save(mockedProduct)).thenReturn(mockedProduct);

@@ -14,7 +14,7 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
-    public InventoryController(InventoryService inventoryService) {
+    public InventoryController(final InventoryService inventoryService) {
         this.inventoryService = inventoryService;
     }
 
@@ -22,7 +22,6 @@ public class InventoryController {
     public List<Inventory> getAll() {
         return inventoryService.getAll();
     }
-
 
     @PutMapping("/{id}")
     public ResponseEntity<Inventory> update(@PathVariable final Long id,

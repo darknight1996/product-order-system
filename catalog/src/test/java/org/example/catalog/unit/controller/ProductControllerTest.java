@@ -1,5 +1,6 @@
 package org.example.catalog.unit.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.catalog.controller.ProductController;
 import org.example.catalog.entity.Product;
@@ -8,13 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,8 +30,11 @@ public class ProductControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
-    public void getAll() throws Exception {
+    public void getAll_success() throws Exception {
         final List<Product> mockedProducts = getProducts();
 
         when(productService.getAll()).thenReturn(mockedProducts);
@@ -71,6 +77,54 @@ public class ProductControllerTest {
         mockMvc.perform(get("/api/v1/product/" + id))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Product not found"));
+    }
+
+    @Test
+    public void add_success() throws Exception {
+        final Product mockedProduct = getProduct();
+        final String json = objectMapper.writeValueAsString(mockedProduct);
+
+        when(productService.add(mockedProduct)).thenReturn(mockedProduct);
+
+        mockMvc.perform(post("/api/v1/product")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isCreated())
+
+                .andExpect(jsonPath("$.id").value(mockedProduct.getId()))
+                .andExpect(jsonPath("$.name").value(mockedProduct.getName()))
+                .andExpect(jsonPath("$.description").value(mockedProduct.getDescription()))
+                .andExpect(jsonPath("$.price").value(mockedProduct.getPrice()));
+    }
+
+    @Test
+    public void add_invalidRequestBody() throws Exception {
+        final String invalidJson = "invalid json";
+
+        mockMvc.perform(post("/api/v1/product")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void delete_success() throws Exception {
+        final Long id = 1L;
+
+        mockMvc.perform(delete("/api/v1/product/" + id))
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void delete_productNotFound() throws Exception {
+        final Long id = 1L;
+
+        doThrow(EntityNotFoundException.class).when(productService).delete(id);
+
+        mockMvc.perform(delete("/api/v1/product/" + id))
+                .andExpect(status().isNotFound());
+
     }
 
     private List<Product> getProducts() {
