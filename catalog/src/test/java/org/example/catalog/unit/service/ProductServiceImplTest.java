@@ -80,7 +80,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void add() throws JsonProcessingException {
+    public void add() {
         final Product mockedProduct = getProduct();
 
         when(productRepository.save(mockedProduct)).thenReturn(mockedProduct);
