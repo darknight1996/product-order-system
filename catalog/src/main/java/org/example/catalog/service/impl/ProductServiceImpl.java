@@ -8,7 +8,6 @@ import org.example.catalog.service.ProductService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -30,9 +29,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getById(final Long id) {
-        final Optional<Product> productOptional = productRepository.findById(id);
-
-        return productOptional.orElseThrow(() -> new EntityNotFoundException("Product not found"));
+        return getExistedProduct(id);
     }
 
     @Override
@@ -46,24 +43,30 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void delete(final Long id) {
-        final Optional<Product> existedProduct = productRepository.findById(id);
+        final Product existedProduct = getExistedProduct(id);
 
-        if (existedProduct.isPresent()) {
-            productRepository.deleteById(id);
+        productRepository.deleteById(id);
 
-            productMessageService.sendDelete(existedProduct.get());
-        } else {
-            throw new EntityNotFoundException("Product not found");
-        }
+        productMessageService.sendDelete(existedProduct);
     }
 
     @Override
     public Product update(final Product product) {
-        final Product savedProduct = productRepository.save(product);
+        final Product existedProduct = getExistedProduct(product.getId());
+
+        existedProduct.setName(product.getName());
+        existedProduct.setDescription(product.getDescription());
+        existedProduct.setPrice(product.getPrice());
+
+        final Product savedProduct = productRepository.save(existedProduct);
 
         productMessageService.sendUpdate(savedProduct);
 
         return savedProduct;
+    }
+
+    private Product getExistedProduct(final Long id) {
+        return productRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product not found"));
     }
 
 }

@@ -1,46 +1,28 @@
 package org.example.catalog.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 
-public class ProductUpdateDTO {
+public class ProductUpdateDTO extends ProductAddDTO {
 
-    private String name;
-
-    private String description;
-
-    private BigDecimal price;
+    @NotNull(message = "id is mandatory")
+    private Long id;
 
     public ProductUpdateDTO() {
     }
 
-    public ProductUpdateDTO(final String name, final String description, final BigDecimal price) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
+    public ProductUpdateDTO(final Long id, final String name, final String description, final BigDecimal price) {
+        super(name, description, price);
+        this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public Long getId() {
+        return id;
     }
 
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(final BigDecimal price) {
-        this.price = price;
+    public void setId(Long id) {
+        this.id = id;
     }
 
 }

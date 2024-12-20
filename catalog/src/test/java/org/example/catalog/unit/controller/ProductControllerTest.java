@@ -4,17 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.catalog.controller.ProductController;
 import org.example.catalog.entity.Product;
+import org.example.catalog.mapper.ProductMapper;
 import org.example.catalog.service.ProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -24,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = ProductController.class)
 public class ProductControllerTest {
 
-    @MockBean
+    @MockitoBean
     private ProductService productService;
 
     @Autowired
@@ -32,6 +34,9 @@ public class ProductControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockitoBean
+    private ProductMapper productMapper;
 
     @Test
     public void getAll_success() throws Exception {
@@ -84,6 +89,7 @@ public class ProductControllerTest {
         final Product mockedProduct = getProduct();
         final String json = objectMapper.writeValueAsString(mockedProduct);
 
+        when(productMapper.productFromProductAddDto(any())).thenReturn(mockedProduct);
         when(productService.add(mockedProduct)).thenReturn(mockedProduct);
 
         mockMvc.perform(post("/api/v1/product")

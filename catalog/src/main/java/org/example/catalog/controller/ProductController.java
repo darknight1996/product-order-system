@@ -1,7 +1,10 @@
 package org.example.catalog.controller;
 
+import jakarta.validation.Valid;
+import org.example.catalog.dto.ProductAddDTO;
 import org.example.catalog.dto.ProductUpdateDTO;
 import org.example.catalog.entity.Product;
+import org.example.catalog.mapper.ProductMapper;
 import org.example.catalog.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +17,11 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductMapper productMapper;
 
-    public ProductController(final ProductService productService) {
+    public ProductController(final ProductService productService, final ProductMapper productMapper) {
         this.productService = productService;
+        this.productMapper = productMapper;
     }
 
     @GetMapping("/all")
@@ -32,7 +37,9 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> add(@RequestBody final Product product) {
+    public ResponseEntity<Product> add(@RequestBody final ProductAddDTO productAddDTO) {
+        final Product product = productMapper.productFromProductAddDto(productAddDTO);
+
         final Product savedProduct = productService.add(product);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
@@ -45,17 +52,13 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Product> update(@PathVariable final Long id, @RequestBody final ProductUpdateDTO productDTO) {
-        Product product = productService.getById(id);
+    @PutMapping
+    public ResponseEntity<Product> update(@Valid @RequestBody final ProductUpdateDTO productUpdateDTO) {
+        final Product product = productMapper.productFromProductUpdateDto(productUpdateDTO);
 
-        product.setName(productDTO.getName());
-        product.setDescription(productDTO.getDescription());
-        product.setPrice(productDTO.getPrice());
+        final Product updatedProduct = productService.update(product);
 
-        product = productService.update(product);
-
-        return ResponseEntity.ok().body(product);
+        return ResponseEntity.ok().body(updatedProduct);
     }
 
 }
