@@ -16,6 +16,6 @@ public interface InventoryService {
 
     void delete(final Long id);
 
-    Inventory update(final Inventory inventory);
+    Inventory updateQuantity(final Long id, final Integer quantity);
 
 }

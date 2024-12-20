@@ -23,14 +23,10 @@ public class InventoryController {
         return inventoryService.getAll();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Inventory> update(@PathVariable final Long id,
-                                            @RequestBody final InventoryUpdateDTO inventoryUpdateDTO) {
-        Inventory inventory = inventoryService.getById(id);
-
-        inventory.setQuantity(inventoryUpdateDTO.getQuantity());
-
-        inventory = inventoryService.update(inventory);
+    @PutMapping
+    public ResponseEntity<Inventory> update(@RequestBody final InventoryUpdateDTO inventoryUpdateDTO) {
+        final Inventory inventory = inventoryService.
+                updateQuantity(inventoryUpdateDTO.getId(), inventoryUpdateDTO.getQuantity());
 
         return ResponseEntity.ok().body(inventory);
     }

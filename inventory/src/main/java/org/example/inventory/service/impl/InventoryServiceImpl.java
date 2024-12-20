@@ -7,7 +7,6 @@ import org.example.inventory.service.InventoryService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
@@ -25,9 +24,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public Inventory getById(final Long id) {
-        final Optional<Inventory> inventoryOptional = inventoryRepository.findById(id);
-
-        return inventoryOptional.orElseThrow(() -> new EntityNotFoundException("Inventory not found"));
+        return getExistedInventory(id);
     }
 
     @Override
@@ -37,18 +34,22 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public void delete(final Long id) {
-        final Optional<Inventory> inventoryOptional = inventoryRepository.findById(id);
+        final Inventory existedInventory = getExistedInventory(id);
 
-        if (inventoryOptional.isPresent()) {
-            inventoryRepository.delete(inventoryOptional.get());
-        } else {
-            throw new EntityNotFoundException("Inventory not found");
-        }
+        inventoryRepository.delete(existedInventory);
     }
 
     @Override
-    public Inventory update(final Inventory inventory) {
-        return inventoryRepository.save(inventory);
+    public Inventory updateQuantity(final Long id, final Integer quantity) {
+        final Inventory existedInventory = getExistedInventory(id);
+
+        existedInventory.setQuantity(quantity);
+
+        return inventoryRepository.save(existedInventory);
+    }
+
+    private Inventory getExistedInventory(final Long id) {
+        return inventoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Inventory not found"));
     }
 
 }
