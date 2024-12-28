@@ -1,6 +1,8 @@
 package org.example.inventory.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import org.example.inventory.dto.OrderDTO;
 import org.example.inventory.entity.Inventory;
 import org.example.inventory.repository.InventoryRepository;
 import org.example.inventory.service.InventoryService;
@@ -46,6 +48,25 @@ public class InventoryServiceImpl implements InventoryService {
         existedInventory.setQuantity(quantity);
 
         return inventoryRepository.save(existedInventory);
+    }
+
+    @Override
+    @Transactional
+    public boolean adjustInventory(final OrderDTO orderDTO) {
+        final Long orderProductId = orderDTO.getProductId();
+        final Integer orderQuantity = orderDTO.getQuantity();
+
+        final Inventory inventory = inventoryRepository.findByProductId(orderProductId)
+                .orElseThrow(() -> new EntityNotFoundException("Inventory not found"));
+
+        if (inventory.getQuantity() < orderQuantity) {
+            return false;
+        }
+
+        inventory.setQuantity(inventory.getQuantity() - orderQuantity);
+        inventoryRepository.save(inventory);
+
+        return true;
     }
 
     private Inventory getExistedInventory(final Long id) {

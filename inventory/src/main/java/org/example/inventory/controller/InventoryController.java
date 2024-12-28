@@ -1,8 +1,10 @@
 package org.example.inventory.controller;
 
 import org.example.inventory.dto.InventoryUpdateDTO;
+import org.example.inventory.dto.OrderDTO;
 import org.example.inventory.entity.Inventory;
 import org.example.inventory.service.InventoryService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +21,8 @@ public class InventoryController {
     }
 
     @GetMapping("/all")
-    public List<Inventory> getAll() {
-        return inventoryService.getAll();
+    public ResponseEntity<List<Inventory>> getAll() {
+        return ResponseEntity.ok().body(inventoryService.getAll());
     }
 
     @PutMapping
@@ -29,6 +31,17 @@ public class InventoryController {
                 updateQuantity(inventoryUpdateDTO.getId(), inventoryUpdateDTO.getQuantity());
 
         return ResponseEntity.ok().body(inventory);
+    }
+
+    @PostMapping("/adjust")
+    public ResponseEntity<String> adjustInventory(@RequestBody final OrderDTO orderDTO) {
+        boolean success = inventoryService.adjustInventory(orderDTO);
+
+        if (success) {
+            return ResponseEntity.ok("Inventory adjusted successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Insufficient inventory.");
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package org.example.inventory.service;
 
+import org.example.inventory.dto.OrderDTO;
 import org.example.inventory.entity.Inventory;
 import org.springframework.stereotype.Service;
 
@@ -17,5 +18,7 @@ public interface InventoryService {
     void delete(final Long id);
 
     Inventory updateQuantity(final Long id, final Integer quantity);
+
+    boolean adjustInventory(final OrderDTO orderDTO);
 
 }
