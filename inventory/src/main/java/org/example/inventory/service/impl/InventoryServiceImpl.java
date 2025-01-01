@@ -56,14 +56,14 @@ public class InventoryServiceImpl implements InventoryService {
         final Long orderProductId = orderDTO.getProductId();
         final Integer orderQuantity = orderDTO.getQuantity();
 
-        final Inventory inventory = inventoryRepository.findByProductId(orderProductId)
-                .orElseThrow(() -> new EntityNotFoundException("Inventory not found"));
+        final Inventory inventory = getExistedInventoryByProductId(orderProductId);
+        final Integer inventoryQuantity = inventory.getQuantity();
 
-        if (inventory.getQuantity() < orderQuantity) {
+        if (inventoryQuantity < orderQuantity) {
             return false;
         }
 
-        inventory.setQuantity(inventory.getQuantity() - orderQuantity);
+        inventory.setQuantity(inventoryQuantity - orderQuantity);
         inventoryRepository.save(inventory);
 
         return true;
@@ -71,6 +71,11 @@ public class InventoryServiceImpl implements InventoryService {
 
     private Inventory getExistedInventory(final Long id) {
         return inventoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Inventory not found"));
+    }
+
+    private Inventory getExistedInventoryByProductId(final Long productId) {
+        return inventoryRepository.findByProductId(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Inventory not found"));
     }
 
 }
