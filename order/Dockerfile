@@ -8,7 +8,7 @@ WORKDIR /message
 RUN mvn clean install
 
 # Copy the Spring Boot app
-COPY ./catalog /app
+COPY ./order /app
 
 # Build the Spring Boot app
 WORKDIR /app
@@ -16,5 +16,5 @@ RUN mvn clean package -DskipTests
 
 FROM openjdk:21-jdk-slim
 WORKDIR /app
-COPY --from=build /app/target/catalog*.jar app.jar
+COPY --from=build /app/target/order*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,4 +1,4 @@
-FROM maven:3.8.7-eclipse-temurin-19 AS build
+FROM jelastic/maven:3.9.5-openjdk-21 AS build
 
 # Copy dependency module
 COPY ./message /message
