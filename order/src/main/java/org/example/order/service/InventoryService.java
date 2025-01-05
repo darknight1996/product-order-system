@@ -4,7 +4,7 @@ import org.example.order.dto.OrderAddDTO;
 import org.springframework.stereotype.Service;
 
 @Service
-public interface InventoryClient {
+public interface InventoryService {
 
     void adjustInventory(OrderAddDTO orderAddDTO);
 

@@ -1,10 +1,10 @@
-package org.example.order.service.impl;
+package org.example.order.service.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.order.dto.OrderAddDTO;
 import org.example.order.exception.InsufficientInventoryException;
-import org.example.order.service.InventoryClient;
+import org.example.order.service.InventoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,9 +18,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 @Service
-public class InventoryClientHttp implements InventoryClient {
+public class InventoryHttpClient implements InventoryService {
 
-    private static final Logger logger = LoggerFactory.getLogger(InventoryClientHttp.class);
+    private static final Logger logger = LoggerFactory.getLogger(InventoryHttpClient.class);
 
     private final ObjectMapper objectMapper;
     private final HttpClient httpClient;
@@ -28,7 +28,7 @@ public class InventoryClientHttp implements InventoryClient {
     @Value("${inventory.url}")
     private String inventoryUrl;
 
-    public InventoryClientHttp(ObjectMapper objectMapper) {
+    public InventoryHttpClient(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         this.httpClient = HttpClient.newHttpClient();
     }
@@ -36,23 +36,18 @@ public class InventoryClientHttp implements InventoryClient {
     @Override
     public void adjustInventory(OrderAddDTO orderAddDTO) {
         try {
-            final String requestBody = objectMapper.writeValueAsString(orderAddDTO);
-            final HttpResponse<String> response = sendAdjustInventoryRequest(requestBody);
+            String requestBody = objectMapper.writeValueAsString(orderAddDTO);
+            HttpResponse<String> response = sendAdjustInventoryRequest(requestBody);
 
-            handleInventoryResponse(response);
+            validateResponse(response);
         } catch (IOException | InterruptedException e) {
-            logger.error("Error during inventory adjustment: {}", e.getMessage());
-            throw new RuntimeException("Error during inventory adjustment: " + e.getMessage(), e);
-        } catch (InsufficientInventoryException | EntityNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("Unexpected error: {}", e.getMessage());
-            throw new RuntimeException("Unexpected error: " + e.getMessage(), e);
+            logger.error("Error adjusting inventory: {}", e.getMessage());
+            throw new RuntimeException("Error adjusting inventory", e);
         }
     }
 
     private HttpResponse<String> sendAdjustInventoryRequest(String requestBody) throws IOException, InterruptedException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(inventoryUrl + "/api/v1/inventory/adjust"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
@@ -61,7 +56,7 @@ public class InventoryClientHttp implements InventoryClient {
         return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    private void handleInventoryResponse(HttpResponse<String> response) {
+    private void validateResponse(HttpResponse<String> response) {
         if (response.statusCode() == HttpStatus.CONFLICT.value()) {
             logger.warn("Inventory conflict: {}", response.body());
             throw new InsufficientInventoryException(response.body());
@@ -77,7 +72,7 @@ public class InventoryClientHttp implements InventoryClient {
             throw new RuntimeException("Failed to adjust inventory: " + response.body());
         }
 
-        logger.info("Inventory adjustment successful: {}", response.body());
+        logger.info("Inventory adjusted successfully.");
     }
 
 }
