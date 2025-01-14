@@ -97,6 +97,9 @@ public class ProductServiceImplTest {
         when(productRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> cut.delete(id));
+
+        verify(productRepository, never()).deleteById(any());
+        verify(productMessageService, never()).sendDelete(any());
     }
 
     @Test
@@ -127,6 +130,9 @@ public class ProductServiceImplTest {
         when(productRepository.findById(product.getId())).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> cut.update(product));
+
+        verify(productRepository, never()).save(any());
+        verify(productMessageService, never()).sendUpdate(any());
     }
 
     private List<Product> getProducts() {
