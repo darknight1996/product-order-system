@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,7 +53,7 @@ public class KafkaProductMessageServiceTest {
             case UPDATE -> cut.sendUpdate(mockedProduct);
         }
 
-        verify(kafkaTemplate).send(eq("product-events"), capturedProductEvent.capture());
+        verify(kafkaTemplate, times(1)).send(eq("product-events"), capturedProductEvent.capture());
 
         final ProductEvent productEvent = capturedProductEvent.getValue();
 
