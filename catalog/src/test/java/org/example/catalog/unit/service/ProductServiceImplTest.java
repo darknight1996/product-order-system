@@ -15,8 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,41 +31,28 @@ public class ProductServiceImplTest {
     private ProductServiceImpl cut;
 
     @Test
-    public void getAll_success() {
-        final List<Product> mockedProducts = getProducts();
+    public void getAll_shouldReturnAllProducts() {
+        final List<Product> products = getProducts();
 
-        when(productRepository.findAll()).thenReturn(mockedProducts);
+        when(productRepository.findAll()).thenReturn(products);
 
-        final List<Product> products = cut.getAll();
+        final List<Product> result = cut.getAll();
 
         assertEquals(2, products.size());
 
-        assertEquals(mockedProducts.get(0).getId(), products.get(0).getId());
-        assertEquals(mockedProducts.get(1).getId(), products.get(1).getId());
-
-        assertEquals(mockedProducts.get(0).getName(), products.get(0).getName());
-        assertEquals(mockedProducts.get(1).getName(), products.get(1).getName());
-
-        assertEquals(mockedProducts.get(0).getDescription(), products.get(0).getDescription());
-        assertEquals(mockedProducts.get(1).getDescription(), products.get(1).getDescription());
-
-        assertEquals(mockedProducts.get(0).getPrice(), products.get(0).getPrice());
-        assertEquals(mockedProducts.get(1).getPrice(), products.get(1).getPrice());
-
+        assertEquals(products.get(0), result.get(0));
+        assertEquals(products.get(1), result.get(1));
     }
 
     @Test
-    public void getById_success() {
-        final Product mockedProduct = getProduct();
+    public void getById_shouldReturnProductById() {
+        final Product product = getProduct();
 
-        when(productRepository.findById(mockedProduct.getId())).thenReturn(Optional.of(mockedProduct));
+        when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
 
-        final Product product = cut.getById(mockedProduct.getId());
+        final Product result = cut.getById(product.getId());
 
-        assertEquals(mockedProduct.getId(), product.getId());
-        assertEquals(mockedProduct.getName(), product.getName());
-        assertEquals(mockedProduct.getDescription(), product.getDescription());
-        assertEquals(mockedProduct.getPrice(), product.getPrice());
+        assertEquals(product, result);
     }
 
     @Test
@@ -79,20 +65,74 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void add_success() {
-        final Product mockedProduct = getProduct();
+    public void add_shouldAddProduct() {
+        final Product product = getProduct();
 
-        when(productRepository.save(mockedProduct)).thenReturn(mockedProduct);
+        when(productRepository.save(product)).thenReturn(product);
 
-        final Product product = cut.add(mockedProduct);
+        final Product result = cut.add(product);
 
-        assertEquals(mockedProduct.getId(), product.getId());
-        assertEquals(mockedProduct.getName(), product.getName());
-        assertEquals(mockedProduct.getDescription(), product.getDescription());
-        assertEquals(mockedProduct.getPrice(), product.getPrice());
+        assertEquals(product, result);
 
-        verify(productRepository, times(1)).save(mockedProduct);
-        verify(productMessageService,times(1)).sendAdd(mockedProduct);
+        verify(productRepository, times(1)).save(product);
+        verify(productMessageService,times(1)).sendAdd(product);
+    }
+
+    @Test
+    public void delete_shouldDeleteProduct() {
+        final Product product = getProduct();
+
+        when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
+
+        cut.delete(product.getId());
+
+        verify(productRepository, times(1)).deleteById(product.getId());
+        verify(productMessageService, times(1)).sendDelete(product);
+    }
+
+    @Test
+    public void delete_productNotFound() {
+        final Long id = 1L;
+
+        when(productRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> cut.delete(id));
+
+        verify(productRepository, never()).deleteById(any());
+        verify(productMessageService, never()).sendDelete(any());
+    }
+
+    @Test
+    public void update_shouldUpdateProduct() {
+        final Product existedProduct = getProduct();
+        final Product updatedProduct = getUpdatedProduct();
+
+        when(productRepository.findById(existedProduct.getId())).thenReturn(Optional.of(existedProduct));
+        when(productRepository.save(existedProduct)).thenReturn(updatedProduct);
+
+        final Product result = cut.update(updatedProduct);
+
+        assertNotNull(result);
+        assertEquals(updatedProduct, result);
+
+        assertEquals(existedProduct.getName(), updatedProduct.getName());
+        assertEquals(existedProduct.getPrice(), updatedProduct.getPrice());
+        assertEquals(existedProduct.getDescription(), updatedProduct.getDescription());
+
+        verify(productRepository, times(1)).save(existedProduct);
+        verify(productMessageService, times(1)).sendUpdate(updatedProduct);
+    }
+
+    @Test
+    public void update_productNotFound() {
+        final Product product = getProduct();
+
+        when(productRepository.findById(product.getId())).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> cut.update(product));
+
+        verify(productRepository, never()).save(any());
+        verify(productMessageService, never()).sendUpdate(any());
     }
 
     private List<Product> getProducts() {
@@ -104,6 +144,15 @@ public class ProductServiceImplTest {
 
     private Product getProduct() {
         return new Product(1L, "product", "description", BigDecimal.valueOf(1000));
+    }
+
+    private Product getUpdatedProduct() {
+        final Product updatedProduct = getProduct();
+
+        updatedProduct.setName("updated product");
+        updatedProduct.setDescription("updated description");
+
+        return updatedProduct;
     }
 
 }
