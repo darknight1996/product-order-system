@@ -2,6 +2,7 @@ package org.example.catalog.unit.message;
 
 import org.example.catalog.entity.Product;
 import org.example.catalog.message.impl.KafkaProductMessageService;
+import org.example.catalog.util.ProductInitializer;
 import org.example.message.ActionType;
 import org.example.message.ProductEvent;
 import org.junit.jupiter.api.Test;
@@ -11,8 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
-
-import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
@@ -44,7 +43,7 @@ class KafkaProductMessageServiceTest {
     }
 
     private void sendMessage(ActionType actionType) {
-        final Product mockedProduct = createProduct();
+        final Product mockedProduct = ProductInitializer.createProduct();
         final ArgumentCaptor<ProductEvent> capturedProductEvent = ArgumentCaptor.forClass(ProductEvent.class);
 
         switch (actionType) {
@@ -62,10 +61,6 @@ class KafkaProductMessageServiceTest {
         assertEquals(mockedProduct.getPrice(), productEvent.getProduct().getPrice());
 
         assertEquals(actionType, productEvent.getActionType());
-    }
-
-    private Product createProduct() {
-        return new Product(1L, "name", "description", BigDecimal.valueOf(1000));
     }
 
 }

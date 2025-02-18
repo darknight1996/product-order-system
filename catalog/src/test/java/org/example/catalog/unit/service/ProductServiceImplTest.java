@@ -5,13 +5,13 @@ import org.example.catalog.entity.Product;
 import org.example.catalog.message.ProductMessageService;
 import org.example.catalog.repository.ProductRepository;
 import org.example.catalog.service.impl.ProductServiceImpl;
+import org.example.catalog.util.ProductInitializer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +38,7 @@ class ProductServiceImplTest {
 
     @Test
     void getAll_shouldReturnAllProducts() {
-        final List<Product> products = getProducts();
+        final List<Product> products = ProductInitializer.createProducts();
 
         when(productRepository.findAll()).thenReturn(products);
 
@@ -52,7 +52,7 @@ class ProductServiceImplTest {
 
     @Test
     void getById_shouldReturnProductById() {
-        final Product product = getProduct();
+        final Product product = ProductInitializer.createProduct();
 
         when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
 
@@ -72,7 +72,7 @@ class ProductServiceImplTest {
 
     @Test
     void add_shouldAddProduct() {
-        final Product product = getProduct();
+        final Product product = ProductInitializer.createProduct();
 
         when(productRepository.save(product)).thenReturn(product);
 
@@ -86,7 +86,7 @@ class ProductServiceImplTest {
 
     @Test
     void delete_shouldDeleteProduct() {
-        final Product product = getProduct();
+        final Product product = ProductInitializer.createProduct();
 
         when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
 
@@ -110,8 +110,8 @@ class ProductServiceImplTest {
 
     @Test
     void update_shouldUpdateProduct() {
-        final Product existedProduct = getProduct();
-        final Product updatedProduct = getUpdatedProduct();
+        final Product existedProduct = ProductInitializer.createProduct();
+        final Product updatedProduct = ProductInitializer.createUpdatedProduct();
 
         when(productRepository.findById(existedProduct.getId())).thenReturn(Optional.of(existedProduct));
         when(productRepository.save(existedProduct)).thenReturn(updatedProduct);
@@ -131,7 +131,7 @@ class ProductServiceImplTest {
 
     @Test
     void update_productNotFound() {
-        final Product product = getProduct();
+        final Product product = ProductInitializer.createProduct();
 
         when(productRepository.findById(product.getId())).thenReturn(Optional.empty());
 
@@ -139,26 +139,6 @@ class ProductServiceImplTest {
 
         verify(productRepository, never()).save(any());
         verify(productMessageService, never()).sendUpdate(any());
-    }
-
-    private List<Product> getProducts() {
-        return List.of(
-                new Product(1L, "product 1", "description 1", BigDecimal.valueOf(1000)),
-                new Product(2L, "product 2", "description 2", BigDecimal.valueOf(2000))
-        );
-    }
-
-    private Product getProduct() {
-        return new Product(1L, "product", "description", BigDecimal.valueOf(1000));
-    }
-
-    private Product getUpdatedProduct() {
-        final Product updatedProduct = getProduct();
-
-        updatedProduct.setName("updated product");
-        updatedProduct.setDescription("updated description");
-
-        return updatedProduct;
     }
 
 }
