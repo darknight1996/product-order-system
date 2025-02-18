@@ -20,7 +20,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class KafkaProductMessageServiceTest {
+class KafkaProductMessageServiceTest {
 
     @Mock
     private KafkaTemplate<String, ProductEvent> kafkaTemplate;
@@ -29,17 +29,17 @@ public class KafkaProductMessageServiceTest {
     private KafkaProductMessageService cut;
 
     @Test
-    public void sendAdd_shouldSendMessage() {
+    void sendAdd_shouldSendMessage() {
         sendMessage(ActionType.ADD);
     }
 
     @Test
-    public void sendDelete_shouldSendMessage() {
+    void sendDelete_shouldSendMessage() {
         sendMessage(ActionType.DELETE);
     }
 
     @Test
-    public void sendUpdate_shouldSendMessage() {
+    void sendUpdate_shouldSendMessage() {
         sendMessage(ActionType.UPDATE);
     }
 

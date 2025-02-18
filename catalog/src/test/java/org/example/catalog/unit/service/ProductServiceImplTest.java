@@ -15,11 +15,17 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ProductServiceImplTest {
+class ProductServiceImplTest {
 
     @Mock
     private ProductRepository productRepository;
@@ -31,7 +37,7 @@ public class ProductServiceImplTest {
     private ProductServiceImpl cut;
 
     @Test
-    public void getAll_shouldReturnAllProducts() {
+    void getAll_shouldReturnAllProducts() {
         final List<Product> products = getProducts();
 
         when(productRepository.findAll()).thenReturn(products);
@@ -45,7 +51,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void getById_shouldReturnProductById() {
+    void getById_shouldReturnProductById() {
         final Product product = getProduct();
 
         when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
@@ -56,7 +62,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void getById_productNotFound() {
+    void getById_productNotFound() {
         final Long id = 1L;
 
         when(productRepository.findById(id)).thenReturn(Optional.empty());
@@ -65,7 +71,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void add_shouldAddProduct() {
+    void add_shouldAddProduct() {
         final Product product = getProduct();
 
         when(productRepository.save(product)).thenReturn(product);
@@ -75,11 +81,11 @@ public class ProductServiceImplTest {
         assertEquals(product, result);
 
         verify(productRepository, times(1)).save(product);
-        verify(productMessageService,times(1)).sendAdd(product);
+        verify(productMessageService, times(1)).sendAdd(product);
     }
 
     @Test
-    public void delete_shouldDeleteProduct() {
+    void delete_shouldDeleteProduct() {
         final Product product = getProduct();
 
         when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
@@ -91,7 +97,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void delete_productNotFound() {
+    void delete_productNotFound() {
         final Long id = 1L;
 
         when(productRepository.findById(id)).thenReturn(Optional.empty());
@@ -103,7 +109,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void update_shouldUpdateProduct() {
+    void update_shouldUpdateProduct() {
         final Product existedProduct = getProduct();
         final Product updatedProduct = getUpdatedProduct();
 
@@ -124,7 +130,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void update_productNotFound() {
+    void update_productNotFound() {
         final Product product = getProduct();
 
         when(productRepository.findById(product.getId())).thenReturn(Optional.empty());
@@ -137,8 +143,8 @@ public class ProductServiceImplTest {
 
     private List<Product> getProducts() {
         return List.of(
-                new Product(1L,"product 1", "description 1", BigDecimal.valueOf(1000)),
-                new Product(2L,"product 2", "description 2", BigDecimal.valueOf(2000))
+                new Product(1L, "product 1", "description 1", BigDecimal.valueOf(1000)),
+                new Product(2L, "product 2", "description 2", BigDecimal.valueOf(2000))
         );
     }
 
