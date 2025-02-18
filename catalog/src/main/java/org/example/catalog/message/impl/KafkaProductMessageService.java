@@ -18,21 +18,21 @@ public class KafkaProductMessageService implements ProductMessageService {
 
     @Override
     public void sendAdd(final Product product) {
-        final ProductEvent productEvent = createProductEvent(product, ActionType.ADD);
-
-        sendMessage(productEvent);
+        sendEvent(product, ActionType.ADD);
     }
 
     @Override
     public void sendDelete(final Product product) {
-        final ProductEvent productEvent = createProductEvent(product, ActionType.DELETE);
-
-        sendMessage(productEvent);
+        sendEvent(product, ActionType.DELETE);
     }
 
     @Override
     public void sendUpdate(final Product product) {
-        final ProductEvent productEvent = createProductEvent(product, ActionType.UPDATE);
+        sendEvent(product, ActionType.UPDATE);
+    }
+
+    private void sendEvent(final Product product, final ActionType actionType) {
+        final ProductEvent productEvent = createProductEvent(product, actionType);
 
         sendMessage(productEvent);
     }
