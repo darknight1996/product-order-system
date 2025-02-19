@@ -8,6 +8,7 @@ import org.example.catalog.service.impl.ProductServiceImpl;
 import org.example.catalog.util.ProductInitializer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -16,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -44,8 +44,6 @@ class ProductServiceImplTest {
         when(productRepository.findAll()).thenReturn(PRODUCTS);
 
         final List<Product> result = cut.getAll();
-
-        assertEquals(PRODUCTS.size(), result.size());
 
         assertEquals(PRODUCTS, result);
 
@@ -109,12 +107,16 @@ class ProductServiceImplTest {
         when(productRepository.findById(PRODUCT.getId())).thenReturn(Optional.of(PRODUCT));
         when(productRepository.save(PRODUCT)).thenReturn(UPDATED_PRODUCT);
 
-        final Product result = cut.update(PRODUCT);
+        final Product result = cut.update(UPDATED_PRODUCT);
 
-        assertNotNull(result);
         assertEquals(UPDATED_PRODUCT, result);
 
-        verify(productRepository, times(1)).save(PRODUCT);
+        final ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
+        verify(productRepository, times(1)).save(productCaptor.capture());
+        final Product capturedProduct = productCaptor.getValue();
+
+        assertEquals(UPDATED_PRODUCT, capturedProduct);
+
         verify(productMessageService, times(1)).sendUpdate(UPDATED_PRODUCT);
     }
 

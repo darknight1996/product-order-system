@@ -5,8 +5,9 @@ import org.example.catalog.message.impl.KafkaProductMessageService;
 import org.example.catalog.util.ProductInitializer;
 import org.example.message.ActionType;
 import org.example.message.ProductEvent;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -27,22 +28,9 @@ class KafkaProductMessageServiceTest {
     @InjectMocks
     private KafkaProductMessageService cut;
 
-    @Test
-    void sendAdd_shouldSendMessage() {
-        sendMessage(ActionType.ADD);
-    }
-
-    @Test
-    void sendDelete_shouldSendMessage() {
-        sendMessage(ActionType.DELETE);
-    }
-
-    @Test
-    void sendUpdate_shouldSendMessage() {
-        sendMessage(ActionType.UPDATE);
-    }
-
-    private void sendMessage(ActionType actionType) {
+    @ParameterizedTest
+    @EnumSource(ActionType.class)
+    void sendMessage_shouldSendMessage(ActionType actionType) {
         final Product mockedProduct = ProductInitializer.createProduct();
         final ArgumentCaptor<ProductEvent> capturedProductEvent = ArgumentCaptor.forClass(ProductEvent.class);
 
@@ -59,7 +47,6 @@ class KafkaProductMessageServiceTest {
         assertEquals(mockedProduct.getId(), productEvent.getProduct().getId());
         assertEquals(mockedProduct.getName(), productEvent.getProduct().getName());
         assertEquals(mockedProduct.getPrice(), productEvent.getProduct().getPrice());
-
         assertEquals(actionType, productEvent.getActionType());
     }
 

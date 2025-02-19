@@ -122,6 +122,7 @@
                     </execution>
                     <execution>
                         <id>jacoco-check</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
