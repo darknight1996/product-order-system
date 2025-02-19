@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Entity
 public class Inventory {
@@ -23,6 +24,15 @@ public class Inventory {
     private Integer quantity;
 
     public Inventory() {
+    }
+
+    public Inventory(final Long id, final Long productId, final String productName, final BigDecimal productPrice,
+                     final Integer quantity) {
+        this.id = id;
+        this.productId = productId;
+        this.productName = productName;
+        this.productPrice = productPrice;
+        this.quantity = quantity;
     }
 
     public Inventory(final Long productId, final String productName, final BigDecimal productPrice,
@@ -73,4 +83,14 @@ public class Inventory {
         this.quantity = quantity;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Inventory inventory)) return false;
+        return Objects.equals(id, inventory.id) && Objects.equals(productId, inventory.productId) && Objects.equals(productName, inventory.productName) && Objects.equals(productPrice, inventory.productPrice) && Objects.equals(quantity, inventory.quantity);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, productId, productName, productPrice, quantity);
+    }
 }
