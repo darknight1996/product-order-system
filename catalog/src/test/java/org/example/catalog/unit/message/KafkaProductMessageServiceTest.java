@@ -30,7 +30,7 @@ class KafkaProductMessageServiceTest {
 
     @ParameterizedTest
     @EnumSource(ActionType.class)
-    void sendMessage_shouldSendMessage(ActionType actionType) {
+    void sendMessage_shouldSendMessage(final ActionType actionType) {
         final Product mockedProduct = ProductInitializer.createProduct();
         final ArgumentCaptor<ProductEvent> capturedProductEvent = ArgumentCaptor.forClass(ProductEvent.class);
 
