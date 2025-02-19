@@ -32,8 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ProductControllerTest {
 
     private static final String PRODUCT_URL = "/api/v1/product";
-    private static final String PRODUCT_URL_WITH_ID = PRODUCT_URL + "/{id}";
-    private static final String PRODUCT_URL_ALL = PRODUCT_URL + "/all";
+    private static final String PRODUCT_BY_ID_URL = PRODUCT_URL + "/{id}";
+    private static final String PRODUCT_ALL_URL = PRODUCT_URL + "/all";
     private static final String INVALID_JSON = "Invalid JSON";
     private static final String PRODUCT_NOT_FOUND = "Product not found";
     private static final Long PRODUCT_ID = 1L;
@@ -56,7 +56,7 @@ class ProductControllerTest {
 
         when(productService.getAll()).thenReturn(mockedProducts);
 
-        final ResultActions resultActions = mockMvc.perform(get(PRODUCT_URL_ALL));
+        final ResultActions resultActions = mockMvc.perform(get(PRODUCT_ALL_URL));
 
         resultActions.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -78,7 +78,7 @@ class ProductControllerTest {
 
         when(productService.getById(mockedProduct.getId())).thenReturn(mockedProduct);
 
-        mockMvc.perform(get(PRODUCT_URL_WITH_ID, mockedProduct.getId())
+        mockMvc.perform(get(PRODUCT_BY_ID_URL, mockedProduct.getId())
                         .contentType(MediaType.APPLICATION_JSON))
 
                 .andExpect(status().isOk())
@@ -94,7 +94,7 @@ class ProductControllerTest {
     void getById_productNotFound() throws Exception {
         when(productService.getById(PRODUCT_ID)).thenThrow(new EntityNotFoundException(PRODUCT_NOT_FOUND));
 
-        mockMvc.perform(get(PRODUCT_URL_WITH_ID, PRODUCT_ID)
+        mockMvc.perform(get(PRODUCT_BY_ID_URL, PRODUCT_ID)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(PRODUCT_NOT_FOUND));
@@ -131,7 +131,7 @@ class ProductControllerTest {
 
     @Test
     void delete_shouldDeleteProduct() throws Exception {
-        mockMvc.perform(delete(PRODUCT_URL_WITH_ID, PRODUCT_ID))
+        mockMvc.perform(delete(PRODUCT_BY_ID_URL, PRODUCT_ID))
                 .andExpect(status().isOk());
     }
 
@@ -139,7 +139,7 @@ class ProductControllerTest {
     void delete_productNotFound() throws Exception {
         doThrow(new EntityNotFoundException(PRODUCT_NOT_FOUND)).when(productService).delete(PRODUCT_ID);
 
-        mockMvc.perform(delete(PRODUCT_URL_WITH_ID, PRODUCT_ID))
+        mockMvc.perform(delete(PRODUCT_BY_ID_URL, PRODUCT_ID))
                 .andExpect(status().isNotFound());
     }
 

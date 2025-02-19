@@ -18,7 +18,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -26,6 +25,10 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceImplTest {
+
+    private static final Product PRODUCT = ProductInitializer.createProduct();
+    private static final Product UPDATED_PRODUCT = ProductInitializer.createUpdatedProduct();
+    private static final List<Product> PRODUCTS = ProductInitializer.createProducts();
 
     @Mock
     private ProductRepository productRepository;
@@ -38,107 +41,91 @@ class ProductServiceImplTest {
 
     @Test
     void getAll_shouldReturnAllProducts() {
-        final List<Product> products = ProductInitializer.createProducts();
-
-        when(productRepository.findAll()).thenReturn(products);
+        when(productRepository.findAll()).thenReturn(PRODUCTS);
 
         final List<Product> result = cut.getAll();
 
-        assertEquals(2, products.size());
+        assertEquals(PRODUCTS.size(), result.size());
 
-        assertEquals(products.get(0), result.get(0));
-        assertEquals(products.get(1), result.get(1));
+        assertEquals(PRODUCTS, result);
+
+        verify(productRepository, times(1)).findAll();
     }
 
     @Test
     void getById_shouldReturnProductById() {
-        final Product product = ProductInitializer.createProduct();
+        when(productRepository.findById(PRODUCT.getId())).thenReturn(Optional.of(PRODUCT));
 
-        when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
+        final Product result = cut.getById(PRODUCT.getId());
 
-        final Product result = cut.getById(product.getId());
+        assertEquals(PRODUCT, result);
 
-        assertEquals(product, result);
+        verify(productRepository, times(1)).findById(PRODUCT.getId());
     }
 
     @Test
     void getById_productNotFound() {
-        final Long id = 1L;
+        when(productRepository.findById(PRODUCT.getId())).thenReturn(Optional.empty());
 
-        when(productRepository.findById(id)).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> cut.getById(PRODUCT.getId()));
 
-        assertThrows(EntityNotFoundException.class, () -> cut.getById(id));
+        verify(productRepository, times(1)).findById(PRODUCT.getId());
     }
 
     @Test
     void add_shouldAddProduct() {
-        final Product product = ProductInitializer.createProduct();
+        when(productRepository.save(PRODUCT)).thenReturn(PRODUCT);
 
-        when(productRepository.save(product)).thenReturn(product);
+        final Product result = cut.add(PRODUCT);
 
-        final Product result = cut.add(product);
+        assertEquals(PRODUCT, result);
 
-        assertEquals(product, result);
-
-        verify(productRepository, times(1)).save(product);
-        verify(productMessageService, times(1)).sendAdd(product);
+        verify(productRepository, times(1)).save(PRODUCT);
+        verify(productMessageService, times(1)).sendAdd(PRODUCT);
     }
 
     @Test
     void delete_shouldDeleteProduct() {
-        final Product product = ProductInitializer.createProduct();
+        when(productRepository.findById(PRODUCT.getId())).thenReturn(Optional.of(PRODUCT));
 
-        when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
+        cut.delete(PRODUCT.getId());
 
-        cut.delete(product.getId());
-
-        verify(productRepository, times(1)).deleteById(product.getId());
-        verify(productMessageService, times(1)).sendDelete(product);
+        verify(productRepository, times(1)).deleteById(PRODUCT.getId());
+        verify(productMessageService, times(1)).sendDelete(PRODUCT);
     }
 
     @Test
     void delete_productNotFound() {
-        final Long id = 1L;
+        when(productRepository.findById(PRODUCT.getId())).thenReturn(Optional.empty());
 
-        when(productRepository.findById(id)).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> cut.delete(PRODUCT.getId()));
 
-        assertThrows(EntityNotFoundException.class, () -> cut.delete(id));
-
-        verify(productRepository, never()).deleteById(any());
-        verify(productMessageService, never()).sendDelete(any());
+        verify(productRepository, never()).deleteById(PRODUCT.getId());
+        verify(productMessageService, never()).sendDelete(PRODUCT);
     }
 
     @Test
     void update_shouldUpdateProduct() {
-        final Product existedProduct = ProductInitializer.createProduct();
-        final Product updatedProduct = ProductInitializer.createUpdatedProduct();
+        when(productRepository.findById(PRODUCT.getId())).thenReturn(Optional.of(PRODUCT));
+        when(productRepository.save(PRODUCT)).thenReturn(UPDATED_PRODUCT);
 
-        when(productRepository.findById(existedProduct.getId())).thenReturn(Optional.of(existedProduct));
-        when(productRepository.save(existedProduct)).thenReturn(updatedProduct);
-
-        final Product result = cut.update(updatedProduct);
+        final Product result = cut.update(PRODUCT);
 
         assertNotNull(result);
-        assertEquals(updatedProduct, result);
+        assertEquals(UPDATED_PRODUCT, result);
 
-        assertEquals(existedProduct.getName(), updatedProduct.getName());
-        assertEquals(existedProduct.getPrice(), updatedProduct.getPrice());
-        assertEquals(existedProduct.getDescription(), updatedProduct.getDescription());
-
-        verify(productRepository, times(1)).save(existedProduct);
-        verify(productMessageService, times(1)).sendUpdate(updatedProduct);
+        verify(productRepository, times(1)).save(PRODUCT);
+        verify(productMessageService, times(1)).sendUpdate(UPDATED_PRODUCT);
     }
 
     @Test
     void update_productNotFound() {
-        final Product product = ProductInitializer.createProduct();
+        when(productRepository.findById(PRODUCT.getId())).thenReturn(Optional.empty());
 
-        when(productRepository.findById(product.getId())).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () -> cut.update(PRODUCT));
 
-        assertThrows(EntityNotFoundException.class, () -> cut.update(product));
-
-        verify(productRepository, never()).save(any());
-        verify(productMessageService, never()).sendUpdate(any());
+        verify(productRepository, never()).save(PRODUCT);
+        verify(productMessageService, never()).sendUpdate(PRODUCT);
     }
 
 }
