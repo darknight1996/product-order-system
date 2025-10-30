@@ -4,8 +4,7 @@ import org.example.inventory.dto.OrderDTO;
 
 public class OrderInitializer {
 
-    public static OrderDTO createOrderDTO() {
-        return new OrderDTO(1L, 10);
-    }
-
+  public static OrderDTO createOrderDTO() {
+    return new OrderDTO(1L, 10);
+  }
 }

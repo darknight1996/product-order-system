@@ -10,44 +10,38 @@ import org.springframework.stereotype.Service;
 @Service
 public class KafkaProductMessageService implements ProductMessageService {
 
-    private final KafkaTemplate<String, ProductEvent> kafkaTemplate;
+  private final KafkaTemplate<String, ProductEvent> kafkaTemplate;
 
-    public KafkaProductMessageService(final KafkaTemplate<String, ProductEvent> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
-    }
+  public KafkaProductMessageService(final KafkaTemplate<String, ProductEvent> kafkaTemplate) {
+    this.kafkaTemplate = kafkaTemplate;
+  }
 
-    @Override
-    public void sendAdd(final Product product) {
-        sendEvent(product, ActionType.ADD);
-    }
+  @Override
+  public void sendAdd(final Product product) {
+    sendEvent(product, ActionType.ADD);
+  }
 
-    @Override
-    public void sendDelete(final Product product) {
-        sendEvent(product, ActionType.DELETE);
-    }
+  @Override
+  public void sendDelete(final Product product) {
+    sendEvent(product, ActionType.DELETE);
+  }
 
-    @Override
-    public void sendUpdate(final Product product) {
-        sendEvent(product, ActionType.UPDATE);
-    }
+  @Override
+  public void sendUpdate(final Product product) {
+    sendEvent(product, ActionType.UPDATE);
+  }
 
-    private void sendEvent(final Product product, final ActionType actionType) {
-        final ProductEvent productEvent = createProductEvent(product, actionType);
+  private void sendEvent(final Product product, final ActionType actionType) {
+    final ProductEvent productEvent = createProductEvent(product, actionType);
 
-        sendMessage(productEvent);
-    }
+    sendMessage(productEvent);
+  }
 
-    private ProductEvent createProductEvent(final Product product, final ActionType actionType) {
-        return new ProductEvent(
-                product.getId(),
-                product.getName(),
-                product.getPrice(),
-                actionType
-        );
-    }
+  private ProductEvent createProductEvent(final Product product, final ActionType actionType) {
+    return new ProductEvent(product.getId(), product.getName(), product.getPrice(), actionType);
+  }
 
-    private void sendMessage(final ProductEvent productEvent) {
-        kafkaTemplate.send("product-events", productEvent);
-    }
-
+  private void sendMessage(final ProductEvent productEvent) {
+    kafkaTemplate.send("product-events", productEvent);
+  }
 }

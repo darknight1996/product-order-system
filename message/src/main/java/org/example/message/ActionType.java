@@ -1,9 +1,7 @@
 package org.example.message;
 
 public enum ActionType {
-
-    ADD,
-    DELETE,
-    UPDATE
-
+  ADD,
+  DELETE,
+  UPDATE
 }

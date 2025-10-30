@@ -5,63 +5,60 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "orders")
 public class Order {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
 
-    private Long productId;
+  private Long productId;
 
-    private Integer quantity;
+  private Integer quantity;
 
-    private BigDecimal totalCost;
+  private BigDecimal totalCost;
 
-    public Order() {
-    }
+  public Order() {}
 
-    public Order(Long id, Long productId, Integer quantity, BigDecimal totalCost) {
-        this.id = id;
-        this.productId = productId;
-        this.quantity = quantity;
-        this.totalCost = totalCost;
-    }
+  public Order(Long id, Long productId, Integer quantity, BigDecimal totalCost) {
+    this.id = id;
+    this.productId = productId;
+    this.quantity = quantity;
+    this.totalCost = totalCost;
+  }
 
-    public Long getId() {
-        return id;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public Long getProductId() {
-        return productId;
-    }
+  public Long getProductId() {
+    return productId;
+  }
 
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
+  public void setProductId(Long productId) {
+    this.productId = productId;
+  }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
+  public Integer getQuantity() {
+    return quantity;
+  }
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
+  public void setQuantity(Integer quantity) {
+    this.quantity = quantity;
+  }
 
-    public BigDecimal getTotalCost() {
-        return totalCost;
-    }
+  public BigDecimal getTotalCost() {
+    return totalCost;
+  }
 
-    public void setTotalCost(BigDecimal totalCost) {
-        this.totalCost = totalCost;
-    }
-
+  public void setTotalCost(BigDecimal totalCost) {
+    this.totalCost = totalCost;
+  }
 }

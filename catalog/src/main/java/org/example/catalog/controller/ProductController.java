@@ -1,6 +1,7 @@
 package org.example.catalog.controller;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import org.example.catalog.dto.ProductAddDTO;
 import org.example.catalog.dto.ProductUpdateDTO;
 import org.example.catalog.entity.Product;
@@ -17,55 +18,53 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/product")
 public class ProductController {
 
-    private final ProductService productService;
-    private final ProductMapper productMapper;
+  private final ProductService productService;
+  private final ProductMapper productMapper;
 
-    public ProductController(final ProductService productService, final ProductMapper productMapper) {
-        this.productService = productService;
-        this.productMapper = productMapper;
-    }
+  public ProductController(final ProductService productService, final ProductMapper productMapper) {
+    this.productService = productService;
+    this.productMapper = productMapper;
+  }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<Product>> getAll() {
-        return ResponseEntity.ok(productService.getAll());
-    }
+  @GetMapping("/all")
+  public ResponseEntity<List<Product>> getAll() {
+    return ResponseEntity.ok(productService.getAll());
+  }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Product> getById(@PathVariable final Long id) {
-        final Product product = productService.getById(id);
+  @GetMapping("/{id}")
+  public ResponseEntity<Product> getById(@PathVariable final Long id) {
+    final Product product = productService.getById(id);
 
-        return ResponseEntity.ok(product);
-    }
+    return ResponseEntity.ok(product);
+  }
 
-    @PostMapping
-    public ResponseEntity<Product> add(@RequestBody final ProductAddDTO productAddDTO) {
-        final Product product = productMapper.productFromProductAddDto(productAddDTO);
+  @PostMapping
+  public ResponseEntity<Product> add(@RequestBody final ProductAddDTO productAddDTO) {
+    final Product product = productMapper.productFromProductAddDto(productAddDTO);
 
-        final Product savedProduct = productService.add(product);
+    final Product savedProduct = productService.add(product);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
-    }
+    return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
+  }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable final Long id) {
-        productService.delete(id);
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> delete(@PathVariable final Long id) {
+    productService.delete(id);
 
-        return ResponseEntity.ok().build();
-    }
+    return ResponseEntity.ok().build();
+  }
 
-    @PutMapping
-    public ResponseEntity<Product> update(@Valid @RequestBody final ProductUpdateDTO productUpdateDTO) {
-        final Product product = productMapper.productFromProductUpdateDto(productUpdateDTO);
+  @PutMapping
+  public ResponseEntity<Product> update(
+      @Valid @RequestBody final ProductUpdateDTO productUpdateDTO) {
+    final Product product = productMapper.productFromProductUpdateDto(productUpdateDTO);
 
-        final Product updatedProduct = productService.update(product);
+    final Product updatedProduct = productService.update(product);
 
-        return ResponseEntity.ok().body(updatedProduct);
-    }
-
+    return ResponseEntity.ok().body(updatedProduct);
+  }
 }

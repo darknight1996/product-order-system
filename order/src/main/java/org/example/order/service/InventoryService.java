@@ -6,6 +6,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface InventoryService {
 
-    void adjustInventory(OrderAddDTO orderAddDTO);
-
+  void adjustInventory(OrderAddDTO orderAddDTO);
 }

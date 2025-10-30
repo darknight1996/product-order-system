@@ -8,10 +8,11 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
-    Product productFromProductUpdateDto(final ProductUpdateDTO productUpdateDTO);
+  Product productFromProductUpdateDto(final ProductUpdateDTO productUpdateDTO);
 
-    Product productFromProductAddDto(final ProductAddDTO productAddDTO);
+  Product productFromProductAddDto(final ProductAddDTO productAddDTO);
 
-    //void updateProductFromProductDto(@MappingTarget final Product product, final ProductDTO productDTO);
+  // void updateProductFromProductDto(@MappingTarget final Product product, final ProductDTO
+  // productDTO);
 
 }

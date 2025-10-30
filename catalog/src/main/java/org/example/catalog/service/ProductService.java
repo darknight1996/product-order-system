@@ -1,21 +1,19 @@
 package org.example.catalog.service;
 
+import java.util.List;
 import org.example.catalog.entity.Product;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public interface ProductService {
 
-    List<Product> getAll();
+  List<Product> getAll();
 
-    Product getById(final Long id);
+  Product getById(final Long id);
 
-    Product add(final Product product);
+  Product add(final Product product);
 
-    void delete(final Long id);
+  void delete(final Long id);
 
-    Product update(final Product product);
-
+  Product update(final Product product);
 }

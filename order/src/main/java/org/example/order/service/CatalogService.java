@@ -1,12 +1,10 @@
 package org.example.order.service;
 
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
+import org.springframework.stereotype.Service;
 
 @Service
 public interface CatalogService {
 
-    BigDecimal getProductPrice(Long productId);
-
+  BigDecimal getProductPrice(Long productId);
 }
