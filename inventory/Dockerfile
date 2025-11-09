@@ -1,20 +1,16 @@
-FROM jelastic/maven:3.9.5-openjdk-21 AS build
+FROM eclipse-temurin:21-jdk-alpine AS build
 
-# Copy dependency module
+# build dependencies
 COPY ./message /message
-
-# Build the module
 WORKDIR /message
-RUN mvn clean install
+RUN ./gradlew clean build publishToMavenLocal
 
-# Copy the Spring Boot app
+# build inventory application
 COPY ./inventory /app
-
-# Build the Spring Boot app
 WORKDIR /app
-RUN mvn clean package -DskipTests
+RUN ./gradlew clean bootJar
 
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-COPY --from=build /app/target/inventory*.jar app.jar
+COPY --from=build /app/build/libs/inventory*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
