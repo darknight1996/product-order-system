@@ -12,19 +12,19 @@ public class ProductInitializer {
 
   private final ProductService productService;
 
-  public ProductInitializer(final ProductService productService) {
+  public ProductInitializer(ProductService productService) {
     this.productService = productService;
   }
 
   @PostConstruct
   private void init() {
-    final List<Product> products =
+    List<Product> products =
         List.of(
             new Product("Laptop", "High-performance laptop", BigDecimal.valueOf(1500)),
             new Product("Smartphone", "Latest model smartphone", BigDecimal.valueOf(800)),
             new Product("Headphones", "Noise-canceling headphones", BigDecimal.valueOf(200)));
 
-    for (final Product product : products) {
+    for (Product product : products) {
       productService.add(product);
     }
   }

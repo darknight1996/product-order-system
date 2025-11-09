@@ -12,7 +12,7 @@ public class Product {
 
   public Product() {}
 
-  public Product(final Long id, final String name, final BigDecimal price) {
+  public Product(Long id, String name, BigDecimal price) {
     this.id = id;
     this.name = name;
     this.price = price;
@@ -22,7 +22,7 @@ public class Product {
     return id;
   }
 
-  public void setId(final Long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -30,7 +30,7 @@ public class Product {
     return name;
   }
 
-  public void setName(final String name) {
+  public void setName(String name) {
     this.name = name;
   }
 
@@ -38,7 +38,7 @@ public class Product {
     return price;
   }
 
-  public void setPrice(final BigDecimal price) {
+  public void setPrice(BigDecimal price) {
     this.price = price;
   }
 }

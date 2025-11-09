@@ -18,7 +18,7 @@ public class InventoryInitializer {
   }
 
   public static Inventory createUpdatedInventory() {
-    final Inventory updatedInventory = createInventory();
+    Inventory updatedInventory = createInventory();
 
     updatedInventory.setQuantity(updatedInventory.getQuantity() + 1);
 

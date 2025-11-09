@@ -9,11 +9,11 @@ public interface ProductService {
 
   List<Product> getAll();
 
-  Product getById(final Long id);
+  Product getById(Long id);
 
-  Product add(final Product product);
+  Product add(Product product);
 
-  void delete(final Long id);
+  void delete(Long id);
 
-  Product update(final Product product);
+  Product update(Product product);
 }

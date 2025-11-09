@@ -35,15 +35,15 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public Order addOrder(OrderAddDTO orderAddDTO) {
-    final Long productId = orderAddDTO.getProductId();
-    final Integer quantity = orderAddDTO.getQuantity();
+    Long productId = orderAddDTO.getProductId();
+    Integer quantity = orderAddDTO.getQuantity();
 
-    final BigDecimal productPrice = catalogService.getProductPrice(productId);
-    final BigDecimal totalCost = productPrice.multiply(BigDecimal.valueOf(quantity));
+    BigDecimal productPrice = catalogService.getProductPrice(productId);
+    BigDecimal totalCost = productPrice.multiply(BigDecimal.valueOf(quantity));
 
     inventoryService.adjustInventory(orderAddDTO);
 
-    final Order order = new Order();
+    Order order = new Order();
     order.setProductId(productId);
     order.setQuantity(quantity);
     order.setTotalCost(totalCost);

@@ -10,8 +10,7 @@ public class ProductUpdateDTO extends ProductAddDTO {
 
   public ProductUpdateDTO() {}
 
-  public ProductUpdateDTO(
-      final Long id, final String name, final String description, final BigDecimal price) {
+  public ProductUpdateDTO(Long id, String name, String description, BigDecimal price) {
     super(name, description, price);
     this.id = id;
   }

@@ -12,7 +12,7 @@ public class ProductAddDTO {
 
   public ProductAddDTO() {}
 
-  public ProductAddDTO(final String name, final String description, final BigDecimal price) {
+  public ProductAddDTO(String name, String description, BigDecimal price) {
     this.name = name;
     this.description = description;
     this.price = price;
@@ -22,7 +22,7 @@ public class ProductAddDTO {
     return name;
   }
 
-  public void setName(final String name) {
+  public void setName(String name) {
     this.name = name;
   }
 
@@ -30,7 +30,7 @@ public class ProductAddDTO {
     return description;
   }
 
-  public void setDescription(final String description) {
+  public void setDescription(String description) {
     this.description = description;
   }
 
@@ -38,7 +38,7 @@ public class ProductAddDTO {
     return price;
   }
 
-  public void setPrice(final BigDecimal price) {
+  public void setPrice(BigDecimal price) {
     this.price = price;
   }
 }

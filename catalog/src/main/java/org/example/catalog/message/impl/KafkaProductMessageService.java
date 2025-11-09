@@ -12,36 +12,36 @@ public class KafkaProductMessageService implements ProductMessageService {
 
   private final KafkaTemplate<String, ProductEvent> kafkaTemplate;
 
-  public KafkaProductMessageService(final KafkaTemplate<String, ProductEvent> kafkaTemplate) {
+  public KafkaProductMessageService(KafkaTemplate<String, ProductEvent> kafkaTemplate) {
     this.kafkaTemplate = kafkaTemplate;
   }
 
   @Override
-  public void sendAdd(final Product product) {
+  public void sendAdd(Product product) {
     sendEvent(product, ActionType.ADD);
   }
 
   @Override
-  public void sendDelete(final Product product) {
+  public void sendDelete(Product product) {
     sendEvent(product, ActionType.DELETE);
   }
 
   @Override
-  public void sendUpdate(final Product product) {
+  public void sendUpdate(Product product) {
     sendEvent(product, ActionType.UPDATE);
   }
 
-  private void sendEvent(final Product product, final ActionType actionType) {
-    final ProductEvent productEvent = createProductEvent(product, actionType);
+  private void sendEvent(Product product, ActionType actionType) {
+    ProductEvent productEvent = createProductEvent(product, actionType);
 
     sendMessage(productEvent);
   }
 
-  private ProductEvent createProductEvent(final Product product, final ActionType actionType) {
+  private ProductEvent createProductEvent(Product product, ActionType actionType) {
     return new ProductEvent(product.getId(), product.getName(), product.getPrice(), actionType);
   }
 
-  private void sendMessage(final ProductEvent productEvent) {
+  private void sendMessage(ProductEvent productEvent) {
     kafkaTemplate.send("product-events", productEvent);
   }
 }

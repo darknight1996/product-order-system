@@ -47,7 +47,7 @@ class InventoryServiceImplTest {
   void getAll_shouldReturnAllInventories() {
     when(inventoryRepository.findAll()).thenReturn(inventories);
 
-    final List<Inventory> result = cut.getAll();
+    List<Inventory> result = cut.getAll();
 
     assertEquals(inventories, result);
 
@@ -58,7 +58,7 @@ class InventoryServiceImplTest {
   void getById_shouldReturnInventoryById() {
     when(inventoryRepository.findById(inventory.getId())).thenReturn(Optional.of(inventory));
 
-    final Inventory result = cut.getById(inventory.getId());
+    Inventory result = cut.getById(inventory.getId());
 
     assertEquals(inventory, result);
 
@@ -78,7 +78,7 @@ class InventoryServiceImplTest {
   void add_shouldAddInventory() {
     when(inventoryRepository.save(inventory)).thenReturn(inventory);
 
-    final Inventory result = cut.add(inventory);
+    Inventory result = cut.add(inventory);
 
     assertEquals(inventory, result);
 
@@ -108,14 +108,13 @@ class InventoryServiceImplTest {
     when(inventoryRepository.findById(inventory.getId())).thenReturn(Optional.of(inventory));
     when(inventoryRepository.save(inventory)).thenReturn(updatedInventory);
 
-    final Inventory result =
-        cut.updateQuantity(updatedInventory.getId(), updatedInventory.getQuantity());
+    Inventory result = cut.updateQuantity(updatedInventory.getId(), updatedInventory.getQuantity());
 
     assertEquals(updatedInventory, result);
 
-    final ArgumentCaptor<Inventory> inventoryCaptor = ArgumentCaptor.forClass(Inventory.class);
+    ArgumentCaptor<Inventory> inventoryCaptor = ArgumentCaptor.forClass(Inventory.class);
     verify(inventoryRepository, times(1)).save(inventoryCaptor.capture());
-    final Inventory capturedInventory = inventoryCaptor.getValue();
+    Inventory capturedInventory = inventoryCaptor.getValue();
 
     assertEquals(updatedInventory, capturedInventory);
   }
@@ -125,16 +124,16 @@ class InventoryServiceImplTest {
     when(inventoryRepository.findByProductId(inventory.getProductId()))
         .thenReturn(Optional.of(inventory));
 
-    final OrderDTO orderDTO = new OrderDTO(inventory.getProductId(), inventory.getQuantity() - 1);
-    final Integer expectedQuantity = inventory.getQuantity() - orderDTO.getQuantity();
+    OrderDTO orderDTO = new OrderDTO(inventory.getProductId(), inventory.getQuantity() - 1);
+    Integer expectedQuantity = inventory.getQuantity() - orderDTO.getQuantity();
 
-    final boolean result = cut.adjustInventory(orderDTO);
+    boolean result = cut.adjustInventory(orderDTO);
 
     assertTrue(result);
 
-    final ArgumentCaptor<Inventory> inventoryCaptor = ArgumentCaptor.forClass(Inventory.class);
+    ArgumentCaptor<Inventory> inventoryCaptor = ArgumentCaptor.forClass(Inventory.class);
     verify(inventoryRepository, times(1)).save(inventoryCaptor.capture());
-    final Inventory capturedInventory = inventoryCaptor.getValue();
+    Inventory capturedInventory = inventoryCaptor.getValue();
 
     assertEquals(expectedQuantity, capturedInventory.getQuantity());
   }
@@ -144,9 +143,9 @@ class InventoryServiceImplTest {
     when(inventoryRepository.findByProductId(inventory.getProductId()))
         .thenReturn(Optional.of(inventory));
 
-    final OrderDTO orderDTO = new OrderDTO(inventory.getProductId(), inventory.getQuantity() + 1);
+    OrderDTO orderDTO = new OrderDTO(inventory.getProductId(), inventory.getQuantity() + 1);
 
-    final boolean result = cut.adjustInventory(orderDTO);
+    boolean result = cut.adjustInventory(orderDTO);
 
     assertFalse(result);
 

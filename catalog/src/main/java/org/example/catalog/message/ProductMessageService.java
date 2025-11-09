@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ProductMessageService {
 
-  void sendAdd(final Product product);
+  void sendAdd(Product product);
 
-  void sendDelete(final Product product);
+  void sendDelete(Product product);
 
-  void sendUpdate(final Product product);
+  void sendUpdate(Product product);
 }

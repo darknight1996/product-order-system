@@ -13,18 +13,17 @@ public class ControllerExceptionHandler {
 
   @ExceptionHandler(EntityNotFoundException.class)
   public ResponseEntity<ErrorResponse> handleEntityNotFoundException(
-      final EntityNotFoundException exception, final WebRequest request) {
-    final String message = exception.getMessage();
-    final HttpStatus status = HttpStatus.NOT_FOUND;
-    final String path = request.getDescription(false);
+      EntityNotFoundException exception, WebRequest request) {
+    String message = exception.getMessage();
+    HttpStatus status = HttpStatus.NOT_FOUND;
+    String path = request.getDescription(false);
 
-    final ErrorResponse errorResponse = createErrorResponse(status, message, path);
+    ErrorResponse errorResponse = createErrorResponse(status, message, path);
 
     return new ResponseEntity<>(errorResponse, status);
   }
 
-  private ErrorResponse createErrorResponse(
-      final HttpStatus status, final String message, final String path) {
+  private ErrorResponse createErrorResponse(HttpStatus status, String message, String path) {
     return new ErrorResponse(
         LocalDateTime.now(), status.value(), status.getReasonPhrase(), message, path);
   }

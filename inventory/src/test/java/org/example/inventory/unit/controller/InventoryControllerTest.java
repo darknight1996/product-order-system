@@ -42,11 +42,11 @@ class InventoryControllerTest {
 
   @Test
   void getAll_shouldReturnAllInventories() throws Exception {
-    final List<Inventory> inventories = InventoryInitializer.createInventories();
+    List<Inventory> inventories = InventoryInitializer.createInventories();
 
     when(inventoryService.getAll()).thenReturn(inventories);
 
-    final ResultActions resultActions = mockMvc.perform(get(INVENTORY_ALL_URL));
+    ResultActions resultActions = mockMvc.perform(get(INVENTORY_ALL_URL));
 
     resultActions
         .andExpect(status().isOk())
@@ -54,7 +54,7 @@ class InventoryControllerTest {
         .andExpect(jsonPath("$.size()").value(inventories.size()));
 
     for (int i = 0; i < inventories.size(); i++) {
-      final Inventory inventory = inventories.get(i);
+      Inventory inventory = inventories.get(i);
 
       resultActions
           .andExpect(jsonPath(String.format("$[%d].id", i)).value(inventory.getId()))
@@ -69,9 +69,9 @@ class InventoryControllerTest {
 
   @Test
   void update_shouldUpdateInventory() throws Exception {
-    final Inventory inventory = InventoryInitializer.createInventory();
-    final InventoryUpdateDTO inventoryUpdateDTO = InventoryInitializer.createInventoryUpdateDTO();
-    final String json = objectMapper.writeValueAsString(inventoryUpdateDTO);
+    Inventory inventory = InventoryInitializer.createInventory();
+    InventoryUpdateDTO inventoryUpdateDTO = InventoryInitializer.createInventoryUpdateDTO();
+    String json = objectMapper.writeValueAsString(inventoryUpdateDTO);
 
     when(inventoryService.updateQuantity(any(), any())).thenReturn(inventory);
 
@@ -95,8 +95,8 @@ class InventoryControllerTest {
 
   @Test
   void adjustInventory_shouldAdjustInventory() throws Exception {
-    final OrderDTO orderDTO = OrderInitializer.createOrderDTO();
-    final String json = objectMapper.writeValueAsString(orderDTO);
+    OrderDTO orderDTO = OrderInitializer.createOrderDTO();
+    String json = objectMapper.writeValueAsString(orderDTO);
 
     when(inventoryService.adjustInventory(any())).thenReturn(true);
 
@@ -107,8 +107,8 @@ class InventoryControllerTest {
 
   @Test
   void adjustInventory_insufficientInventory() throws Exception {
-    final OrderDTO orderDTO = OrderInitializer.createOrderDTO();
-    final String json = objectMapper.writeValueAsString(orderDTO);
+    OrderDTO orderDTO = OrderInitializer.createOrderDTO();
+    String json = objectMapper.writeValueAsString(orderDTO);
 
     when(inventoryService.adjustInventory(any())).thenReturn(false);
 

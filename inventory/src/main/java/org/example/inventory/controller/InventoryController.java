@@ -20,7 +20,7 @@ public class InventoryController {
 
   private final InventoryService inventoryService;
 
-  public InventoryController(final InventoryService inventoryService) {
+  public InventoryController(InventoryService inventoryService) {
     this.inventoryService = inventoryService;
   }
 
@@ -30,9 +30,8 @@ public class InventoryController {
   }
 
   @PutMapping
-  public ResponseEntity<Inventory> update(
-      @RequestBody final InventoryUpdateDTO inventoryUpdateDTO) {
-    final Inventory inventory =
+  public ResponseEntity<Inventory> update(@RequestBody InventoryUpdateDTO inventoryUpdateDTO) {
+    Inventory inventory =
         inventoryService.updateQuantity(
             inventoryUpdateDTO.getId(), inventoryUpdateDTO.getQuantity());
 
@@ -40,7 +39,7 @@ public class InventoryController {
   }
 
   @PostMapping("/adjust")
-  public ResponseEntity<String> adjustInventory(@RequestBody final OrderDTO orderDTO) {
+  public ResponseEntity<String> adjustInventory(@RequestBody OrderDTO orderDTO) {
     boolean success = inventoryService.adjustInventory(orderDTO);
 
     if (success) {

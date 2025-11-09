@@ -6,5 +6,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ProductMessageService {
 
-  void productEvent(final ProductEvent productEvent);
+  void productEvent(ProductEvent productEvent);
 }

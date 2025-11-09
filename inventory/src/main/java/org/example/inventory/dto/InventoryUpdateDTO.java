@@ -8,7 +8,7 @@ public class InventoryUpdateDTO {
 
   public InventoryUpdateDTO() {}
 
-  public InventoryUpdateDTO(final Long id, final Integer quantity) {
+  public InventoryUpdateDTO(Long id, Integer quantity) {
     this.id = id;
     this.quantity = quantity;
   }
@@ -17,7 +17,7 @@ public class InventoryUpdateDTO {
     return id;
   }
 
-  public void setId(final Long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -25,7 +25,7 @@ public class InventoryUpdateDTO {
     return quantity;
   }
 
-  public void setQuantity(final Integer quantity) {
+  public void setQuantity(Integer quantity) {
     this.quantity = quantity;
   }
 }

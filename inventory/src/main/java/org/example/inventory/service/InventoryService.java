@@ -10,13 +10,13 @@ public interface InventoryService {
 
   List<Inventory> getAll();
 
-  Inventory getById(final Long id);
+  Inventory getById(Long id);
 
-  Inventory add(final Inventory inventory);
+  Inventory add(Inventory inventory);
 
-  void delete(final Long id);
+  void delete(Long id);
 
-  Inventory updateQuantity(final Long id, final Integer quantity);
+  Inventory updateQuantity(Long id, Integer quantity);
 
-  boolean adjustInventory(final OrderDTO orderDTO);
+  boolean adjustInventory(OrderDTO orderDTO);
 }

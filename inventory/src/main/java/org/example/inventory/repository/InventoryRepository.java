@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
-  Optional<Inventory> findByProductId(final Long productId);
+  Optional<Inventory> findByProductId(Long productId);
 
-  void deleteByProductId(final Long productId);
+  void deleteByProductId(Long productId);
 }

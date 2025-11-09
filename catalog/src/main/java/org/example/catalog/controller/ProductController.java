@@ -25,7 +25,7 @@ public class ProductController {
   private final ProductService productService;
   private final ProductMapper productMapper;
 
-  public ProductController(final ProductService productService, final ProductMapper productMapper) {
+  public ProductController(ProductService productService, ProductMapper productMapper) {
     this.productService = productService;
     this.productMapper = productMapper;
   }
@@ -36,14 +36,14 @@ public class ProductController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Product> getById(@PathVariable final Long id) {
+  public ResponseEntity<Product> getById(@PathVariable Long id) {
     final Product product = productService.getById(id);
 
     return ResponseEntity.ok(product);
   }
 
   @PostMapping
-  public ResponseEntity<Product> add(@RequestBody final ProductAddDTO productAddDTO) {
+  public ResponseEntity<Product> add(@RequestBody ProductAddDTO productAddDTO) {
     final Product product = productMapper.productFromProductAddDto(productAddDTO);
 
     final Product savedProduct = productService.add(product);
@@ -52,18 +52,17 @@ public class ProductController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> delete(@PathVariable final Long id) {
+  public ResponseEntity<Void> delete(@PathVariable Long id) {
     productService.delete(id);
 
     return ResponseEntity.ok().build();
   }
 
   @PutMapping
-  public ResponseEntity<Product> update(
-      @Valid @RequestBody final ProductUpdateDTO productUpdateDTO) {
-    final Product product = productMapper.productFromProductUpdateDto(productUpdateDTO);
+  public ResponseEntity<Product> update(@Valid @RequestBody ProductUpdateDTO productUpdateDTO) {
+    Product product = productMapper.productFromProductUpdateDto(productUpdateDTO);
 
-    final Product updatedProduct = productService.update(product);
+    Product updatedProduct = productService.update(product);
 
     return ResponseEntity.ok().body(updatedProduct);
   }

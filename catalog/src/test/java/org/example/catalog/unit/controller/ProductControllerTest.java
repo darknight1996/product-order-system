@@ -47,11 +47,11 @@ class ProductControllerTest {
 
   @Test
   void getAll_shouldReturnAllProducts() throws Exception {
-    final List<Product> mockedProducts = ProductInitializer.createProducts();
+    List<Product> mockedProducts = ProductInitializer.createProducts();
 
     when(productService.getAll()).thenReturn(mockedProducts);
 
-    final ResultActions resultActions = mockMvc.perform(get(PRODUCT_ALL_URL));
+    ResultActions resultActions = mockMvc.perform(get(PRODUCT_ALL_URL));
 
     resultActions
         .andExpect(status().isOk())
@@ -59,7 +59,7 @@ class ProductControllerTest {
         .andExpect(jsonPath("$.size()").value(mockedProducts.size()));
 
     for (int i = 0; i < mockedProducts.size(); i++) {
-      final Product product = mockedProducts.get(i);
+      Product product = mockedProducts.get(i);
 
       resultActions
           .andExpect(jsonPath(String.format("$[%d].id", i)).value(product.getId()))
@@ -72,7 +72,7 @@ class ProductControllerTest {
 
   @Test
   void getById_shouldReturnProductById() throws Exception {
-    final Product mockedProduct = ProductInitializer.createProduct();
+    Product mockedProduct = ProductInitializer.createProduct();
 
     when(productService.getById(mockedProduct.getId())).thenReturn(mockedProduct);
 
@@ -100,8 +100,8 @@ class ProductControllerTest {
 
   @Test
   void add_shouldAddProduct() throws Exception {
-    final Product mockedProduct = ProductInitializer.createProduct();
-    final String json = objectMapper.writeValueAsString(mockedProduct);
+    Product mockedProduct = ProductInitializer.createProduct();
+    String json = objectMapper.writeValueAsString(mockedProduct);
 
     when(productMapper.productFromProductAddDto(any())).thenReturn(mockedProduct);
     when(productService.add(mockedProduct)).thenReturn(mockedProduct);
@@ -137,8 +137,8 @@ class ProductControllerTest {
 
   @Test
   void update_shouldUpdateProduct() throws Exception {
-    final Product mockedProduct = ProductInitializer.createProduct();
-    final String json = objectMapper.writeValueAsString(mockedProduct);
+    Product mockedProduct = ProductInitializer.createProduct();
+    String json = objectMapper.writeValueAsString(mockedProduct);
 
     when(productMapper.productFromProductUpdateDto(any())).thenReturn(mockedProduct);
     when(productService.update(mockedProduct)).thenReturn(mockedProduct);
@@ -162,8 +162,8 @@ class ProductControllerTest {
 
   @Test
   void update_productNotFound() throws Exception {
-    final Product mockedProduct = ProductInitializer.createProduct();
-    final String json = objectMapper.writeValueAsString(mockedProduct);
+    Product mockedProduct = ProductInitializer.createProduct();
+    String json = objectMapper.writeValueAsString(mockedProduct);
 
     when(productMapper.productFromProductUpdateDto(any())).thenReturn(mockedProduct);
     when(productService.update(mockedProduct))

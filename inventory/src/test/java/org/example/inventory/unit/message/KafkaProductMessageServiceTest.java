@@ -31,17 +31,17 @@ class KafkaProductMessageServiceTest {
 
   @Test
   void productEvent_add_shouldAddProductToInventory() {
-    final Product product = ProductInitializer.createProduct();
-    final ProductEvent productEvent = new ProductEvent(product, ActionType.ADD);
+    Product product = ProductInitializer.createProduct();
+    ProductEvent productEvent = new ProductEvent(product, ActionType.ADD);
 
     when(inventoryRepository.findByProductId(product.getId())).thenReturn(Optional.empty());
 
     cut.productEvent(productEvent);
 
-    final ArgumentCaptor<Inventory> inventoryCaptor = ArgumentCaptor.forClass(Inventory.class);
+    ArgumentCaptor<Inventory> inventoryCaptor = ArgumentCaptor.forClass(Inventory.class);
     verify(inventoryRepository, times(1)).save(inventoryCaptor.capture());
-    final Inventory capturedInventory = inventoryCaptor.getValue();
-    final Inventory expectedInventory =
+    Inventory capturedInventory = inventoryCaptor.getValue();
+    Inventory expectedInventory =
         new Inventory(product.getId(), product.getName(), product.getPrice(), 0);
 
     assertEquals(expectedInventory, capturedInventory);
@@ -49,9 +49,9 @@ class KafkaProductMessageServiceTest {
 
   @Test
   void productEvent_add_shouldNotAddProductToInventoryIfInventoryExists() {
-    final Product product = ProductInitializer.createProduct();
-    final ProductEvent productEvent = new ProductEvent(product, ActionType.ADD);
-    final Inventory existedInventory =
+    Product product = ProductInitializer.createProduct();
+    ProductEvent productEvent = new ProductEvent(product, ActionType.ADD);
+    Inventory existedInventory =
         new Inventory(product.getId(), product.getName(), product.getPrice(), 0);
 
     when(inventoryRepository.findByProductId(product.getId()))
@@ -64,8 +64,8 @@ class KafkaProductMessageServiceTest {
 
   @Test
   void productEvent_delete_shouldDeleteInventory() {
-    final Product product = ProductInitializer.createProduct();
-    final ProductEvent productEvent = new ProductEvent(product, ActionType.DELETE);
+    Product product = ProductInitializer.createProduct();
+    ProductEvent productEvent = new ProductEvent(product, ActionType.DELETE);
 
     cut.productEvent(productEvent);
 
@@ -74,12 +74,12 @@ class KafkaProductMessageServiceTest {
 
   @Test
   void productEvent_update_shouldUpdateInventory() {
-    final Product product = ProductInitializer.createProduct();
-    final Product updatedProduct = ProductInitializer.createUpdatedProduct();
-    final ProductEvent productEvent = new ProductEvent(updatedProduct, ActionType.UPDATE);
-    final Inventory existedInventory =
+    Product product = ProductInitializer.createProduct();
+    Product updatedProduct = ProductInitializer.createUpdatedProduct();
+    ProductEvent productEvent = new ProductEvent(updatedProduct, ActionType.UPDATE);
+    Inventory existedInventory =
         new Inventory(product.getId(), product.getName(), product.getPrice(), 0);
-    final Inventory updatedInventory =
+    Inventory updatedInventory =
         new Inventory(
             updatedProduct.getId(), updatedProduct.getName(), updatedProduct.getPrice(), 0);
 
@@ -88,9 +88,9 @@ class KafkaProductMessageServiceTest {
 
     cut.productEvent(productEvent);
 
-    final ArgumentCaptor<Inventory> inventoryCaptor = ArgumentCaptor.forClass(Inventory.class);
+    ArgumentCaptor<Inventory> inventoryCaptor = ArgumentCaptor.forClass(Inventory.class);
     verify(inventoryRepository, times(1)).save(inventoryCaptor.capture());
-    final Inventory capturedInventory = inventoryCaptor.getValue();
+    Inventory capturedInventory = inventoryCaptor.getValue();
 
     assertEquals(updatedInventory, capturedInventory);
   }

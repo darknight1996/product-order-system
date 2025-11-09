@@ -8,7 +8,7 @@ public class OrderDTO {
 
   public OrderDTO() {}
 
-  public OrderDTO(final Long productId, final Integer quantity) {
+  public OrderDTO(Long productId, Integer quantity) {
     this.productId = productId;
     this.quantity = quantity;
   }
@@ -17,7 +17,7 @@ public class OrderDTO {
     return productId;
   }
 
-  public void setProductId(final Long productId) {
+  public void setProductId(Long productId) {
     this.productId = productId;
   }
 
@@ -25,7 +25,7 @@ public class OrderDTO {
     return quantity;
   }
 
-  public void setQuantity(final Integer quantity) {
+  public void setQuantity(Integer quantity) {
     this.quantity = quantity;
   }
 }

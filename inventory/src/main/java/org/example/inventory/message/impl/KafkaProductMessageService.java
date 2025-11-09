@@ -16,16 +16,16 @@ public class KafkaProductMessageService implements ProductMessageService {
 
   private final InventoryRepository inventoryRepository;
 
-  public KafkaProductMessageService(final InventoryRepository inventoryRepository) {
+  public KafkaProductMessageService(InventoryRepository inventoryRepository) {
     this.inventoryRepository = inventoryRepository;
   }
 
   @Override
   @Transactional
   @KafkaListener(topics = "product-events", groupId = "inventory-consumer-group")
-  public void productEvent(final ProductEvent productEvent) {
-    final ActionType actionType = productEvent.getActionType();
-    final Product product = productEvent.getProduct();
+  public void productEvent(ProductEvent productEvent) {
+    ActionType actionType = productEvent.getActionType();
+    Product product = productEvent.getProduct();
 
     switch (actionType) {
       case ADD -> add(product);
@@ -34,30 +34,29 @@ public class KafkaProductMessageService implements ProductMessageService {
     }
   }
 
-  private void add(final Product product) {
-    final Long productId = product.getId();
-    final Optional<Inventory> existedInventory = inventoryRepository.findByProductId(productId);
+  private void add(Product product) {
+    Long productId = product.getId();
+    Optional<Inventory> existedInventory = inventoryRepository.findByProductId(productId);
 
     if (existedInventory.isEmpty()) {
-      final Inventory inventory =
-          new Inventory(productId, product.getName(), product.getPrice(), 0);
+      Inventory inventory = new Inventory(productId, product.getName(), product.getPrice(), 0);
 
       inventoryRepository.save(inventory);
     }
   }
 
-  private void delete(final Product product) {
-    final Long productId = product.getId();
+  private void delete(Product product) {
+    Long productId = product.getId();
 
     inventoryRepository.deleteByProductId(productId);
   }
 
-  private void update(final Product product) {
-    final Long productId = product.getId();
-    final Optional<Inventory> existedInventory = inventoryRepository.findByProductId(productId);
+  private void update(Product product) {
+    Long productId = product.getId();
+    Optional<Inventory> existedInventory = inventoryRepository.findByProductId(productId);
 
     if (existedInventory.isPresent()) {
-      final Inventory inventory = existedInventory.get();
+      Inventory inventory = existedInventory.get();
 
       inventory.setProductName(product.getName());
       inventory.setProductPrice(product.getPrice());

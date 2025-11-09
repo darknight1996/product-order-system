@@ -16,8 +16,7 @@ public class ProductServiceImpl implements ProductService {
   private final ProductMessageService productMessageService;
 
   public ProductServiceImpl(
-      final ProductRepository productRepository,
-      final ProductMessageService productMessageService) {
+      ProductRepository productRepository, ProductMessageService productMessageService) {
     this.productRepository = productRepository;
     this.productMessageService = productMessageService;
   }
@@ -28,13 +27,13 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public Product getById(final Long id) {
+  public Product getById(Long id) {
     return getExistedProduct(id);
   }
 
   @Override
-  public Product add(final Product product) {
-    final Product savedProduct = productRepository.save(product);
+  public Product add(Product product) {
+    Product savedProduct = productRepository.save(product);
 
     productMessageService.sendAdd(savedProduct);
 
@@ -42,7 +41,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public void delete(final Long id) {
+  public void delete(Long id) {
     final Product existedProduct = getExistedProduct(id);
 
     productRepository.deleteById(id);
@@ -51,21 +50,21 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public Product update(final Product product) {
-    final Product existedProduct = getExistedProduct(product.getId());
+  public Product update(Product product) {
+    Product existedProduct = getExistedProduct(product.getId());
 
     existedProduct.setName(product.getName());
     existedProduct.setDescription(product.getDescription());
     existedProduct.setPrice(product.getPrice());
 
-    final Product savedProduct = productRepository.save(existedProduct);
+    Product savedProduct = productRepository.save(existedProduct);
 
     productMessageService.sendUpdate(savedProduct);
 
     return savedProduct;
   }
 
-  private Product getExistedProduct(final Long id) {
+  private Product getExistedProduct(Long id) {
     return productRepository
         .findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Product not found"));

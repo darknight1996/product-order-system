@@ -28,10 +28,9 @@ class KafkaProductMessageServiceTest {
 
   @ParameterizedTest
   @EnumSource(ActionType.class)
-  void sendMessage_shouldSendMessage(final ActionType actionType) {
-    final Product mockedProduct = ProductInitializer.createProduct();
-    final ArgumentCaptor<ProductEvent> capturedProductEvent =
-        ArgumentCaptor.forClass(ProductEvent.class);
+  void sendMessage_shouldSendMessage(ActionType actionType) {
+    Product mockedProduct = ProductInitializer.createProduct();
+    ArgumentCaptor<ProductEvent> capturedProductEvent = ArgumentCaptor.forClass(ProductEvent.class);
 
     switch (actionType) {
       case ADD -> cut.sendAdd(mockedProduct);
@@ -41,7 +40,7 @@ class KafkaProductMessageServiceTest {
 
     verify(kafkaTemplate, times(1)).send(eq("product-events"), capturedProductEvent.capture());
 
-    final ProductEvent productEvent = capturedProductEvent.getValue();
+    ProductEvent productEvent = capturedProductEvent.getValue();
 
     assertEquals(mockedProduct.getId(), productEvent.getProduct().getId());
     assertEquals(mockedProduct.getName(), productEvent.getProduct().getName());

@@ -39,7 +39,7 @@ class ProductServiceImplTest {
   void getAll_shouldReturnAllProducts() {
     when(productRepository.findAll()).thenReturn(PRODUCTS);
 
-    final List<Product> result = cut.getAll();
+    List<Product> result = cut.getAll();
 
     assertEquals(PRODUCTS, result);
 
@@ -50,7 +50,7 @@ class ProductServiceImplTest {
   void getById_shouldReturnProductById() {
     when(productRepository.findById(PRODUCT.getId())).thenReturn(Optional.of(PRODUCT));
 
-    final Product result = cut.getById(PRODUCT.getId());
+    Product result = cut.getById(PRODUCT.getId());
 
     assertEquals(PRODUCT, result);
 
@@ -70,7 +70,7 @@ class ProductServiceImplTest {
   void add_shouldAddProduct() {
     when(productRepository.save(PRODUCT)).thenReturn(PRODUCT);
 
-    final Product result = cut.add(PRODUCT);
+    Product result = cut.add(PRODUCT);
 
     assertEquals(PRODUCT, result);
 
@@ -103,13 +103,13 @@ class ProductServiceImplTest {
     when(productRepository.findById(PRODUCT.getId())).thenReturn(Optional.of(PRODUCT));
     when(productRepository.save(PRODUCT)).thenReturn(UPDATED_PRODUCT);
 
-    final Product result = cut.update(UPDATED_PRODUCT);
+    Product result = cut.update(UPDATED_PRODUCT);
 
     assertEquals(UPDATED_PRODUCT, result);
 
-    final ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
+    ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
     verify(productRepository, times(1)).save(productCaptor.capture());
-    final Product capturedProduct = productCaptor.getValue();
+    Product capturedProduct = productCaptor.getValue();
 
     assertEquals(UPDATED_PRODUCT, capturedProduct);
 

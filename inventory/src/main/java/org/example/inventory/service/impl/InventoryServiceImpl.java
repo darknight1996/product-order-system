@@ -14,7 +14,7 @@ public class InventoryServiceImpl implements InventoryService {
 
   private final InventoryRepository inventoryRepository;
 
-  public InventoryServiceImpl(final InventoryRepository inventoryRepository) {
+  public InventoryServiceImpl(InventoryRepository inventoryRepository) {
     this.inventoryRepository = inventoryRepository;
   }
 
@@ -24,25 +24,25 @@ public class InventoryServiceImpl implements InventoryService {
   }
 
   @Override
-  public Inventory getById(final Long id) {
+  public Inventory getById(Long id) {
     return getExistedInventory(id);
   }
 
   @Override
-  public Inventory add(final Inventory inventory) {
+  public Inventory add(Inventory inventory) {
     return inventoryRepository.save(inventory);
   }
 
   @Override
-  public void delete(final Long id) {
+  public void delete(Long id) {
     final Inventory existedInventory = getExistedInventory(id);
 
     inventoryRepository.delete(existedInventory);
   }
 
   @Override
-  public Inventory updateQuantity(final Long id, final Integer quantity) {
-    final Inventory existedInventory = getExistedInventory(id);
+  public Inventory updateQuantity(Long id, Integer quantity) {
+    Inventory existedInventory = getExistedInventory(id);
 
     existedInventory.setQuantity(quantity);
 
@@ -51,12 +51,12 @@ public class InventoryServiceImpl implements InventoryService {
 
   @Override
   @Transactional
-  public boolean adjustInventory(final OrderDTO orderDTO) {
-    final Long orderProductId = orderDTO.getProductId();
-    final Integer orderQuantity = orderDTO.getQuantity();
+  public boolean adjustInventory(OrderDTO orderDTO) {
+    Long orderProductId = orderDTO.getProductId();
+    Integer orderQuantity = orderDTO.getQuantity();
 
-    final Inventory inventory = getExistedInventoryByProductId(orderProductId);
-    final Integer inventoryQuantity = inventory.getQuantity();
+    Inventory inventory = getExistedInventoryByProductId(orderProductId);
+    Integer inventoryQuantity = inventory.getQuantity();
 
     if (inventoryQuantity < orderQuantity) {
       return false;
@@ -68,13 +68,13 @@ public class InventoryServiceImpl implements InventoryService {
     return true;
   }
 
-  private Inventory getExistedInventory(final Long id) {
+  private Inventory getExistedInventory(Long id) {
     return inventoryRepository
         .findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Inventory not found"));
   }
 
-  private Inventory getExistedInventoryByProductId(final Long productId) {
+  private Inventory getExistedInventoryByProductId(Long productId) {
     return inventoryRepository
         .findByProductId(productId)
         .orElseThrow(() -> new EntityNotFoundException("Inventory not found"));

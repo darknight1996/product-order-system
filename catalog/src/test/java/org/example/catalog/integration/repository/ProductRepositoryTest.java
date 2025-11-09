@@ -21,9 +21,9 @@ class ProductRepositoryTest {
 
   @Test
   void testSave() {
-    final Product product = getProduct();
+    Product product = getProduct();
 
-    final Product savedProduct = productRepository.save(product);
+    Product savedProduct = productRepository.save(product);
 
     assertNotNull(savedProduct.getId());
     assertEquals(product, savedProduct);
@@ -31,9 +31,9 @@ class ProductRepositoryTest {
 
   @Test
   void testFindById() {
-    final Product product = productRepository.save(getProduct());
+    Product product = productRepository.save(getProduct());
 
-    final Optional<Product> foundProduct = productRepository.findById(product.getId());
+    Optional<Product> foundProduct = productRepository.findById(product.getId());
 
     assertTrue(foundProduct.isPresent());
     assertEquals(product, foundProduct.get());
@@ -41,11 +41,11 @@ class ProductRepositoryTest {
 
   @Test
   void testFindAll() {
-    final List<Product> products = getProducts();
+    List<Product> products = getProducts();
 
     productRepository.saveAll(products);
 
-    final List<Product> foundProducts = productRepository.findAll();
+    List<Product> foundProducts = productRepository.findAll();
 
     assertEquals(products.size(), foundProducts.size());
     assertEquals(products.get(0), foundProducts.get(0));
@@ -54,12 +54,12 @@ class ProductRepositoryTest {
 
   @Test
   void testDelete() {
-    final Product product = getProduct();
+    Product product = getProduct();
 
     productRepository.save(product);
     productRepository.delete(product);
 
-    final Optional<Product> foundProduct = productRepository.findById(product.getId());
+    Optional<Product> foundProduct = productRepository.findById(product.getId());
 
     assertFalse(foundProduct.isPresent());
   }

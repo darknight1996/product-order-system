@@ -10,16 +10,13 @@ public class ProductEvent {
 
   public ProductEvent() {}
 
-  public ProductEvent(final Product product, final ActionType actionType) {
+  public ProductEvent(Product product, ActionType actionType) {
     this.product = product;
     this.actionType = actionType;
   }
 
   public ProductEvent(
-      final Long productId,
-      final String productName,
-      final BigDecimal productPrice,
-      final ActionType actionType) {
+      Long productId, String productName, BigDecimal productPrice, ActionType actionType) {
     this.product = new Product(productId, productName, productPrice);
     this.actionType = actionType;
   }
@@ -28,7 +25,7 @@ public class ProductEvent {
     return product;
   }
 
-  public void setProduct(final Product product) {
+  public void setProduct(Product product) {
     this.product = product;
   }
 
@@ -36,7 +33,7 @@ public class ProductEvent {
     return actionType;
   }
 
-  public void setActionType(final ActionType actionType) {
+  public void setActionType(ActionType actionType) {
     this.actionType = actionType;
   }
 }

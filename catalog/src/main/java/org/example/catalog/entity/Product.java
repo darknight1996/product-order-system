@@ -22,14 +22,13 @@ public class Product {
 
   public Product() {}
 
-  public Product(final String name, final String description, final BigDecimal price) {
+  public Product(String name, String description, BigDecimal price) {
     this.name = name;
     this.description = description;
     this.price = price;
   }
 
-  public Product(
-      final Long id, final String name, final String description, final BigDecimal price) {
+  public Product(Long id, String name, String description, BigDecimal price) {
     this.id = id;
     this.name = name;
     this.description = description;
@@ -40,7 +39,7 @@ public class Product {
     return id;
   }
 
-  public void setId(final Long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -48,7 +47,7 @@ public class Product {
     return name;
   }
 
-  public void setName(final String name) {
+  public void setName(String name) {
     this.name = name;
   }
 
@@ -56,7 +55,7 @@ public class Product {
     return description;
   }
 
-  public void setDescription(final String description) {
+  public void setDescription(String description) {
     this.description = description;
   }
 
@@ -64,12 +63,12 @@ public class Product {
     return price;
   }
 
-  public void setPrice(final BigDecimal price) {
+  public void setPrice(BigDecimal price) {
     this.price = price;
   }
 
   @Override
-  public boolean equals(final Object o) {
+  public boolean equals(Object o) {
     if (!(o instanceof Product product)) return false;
     return Objects.equals(id, product.id)
         && Objects.equals(name, product.name)

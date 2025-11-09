@@ -25,11 +25,7 @@ public class Inventory {
   public Inventory() {}
 
   public Inventory(
-      final Long id,
-      final Long productId,
-      final String productName,
-      final BigDecimal productPrice,
-      final Integer quantity) {
+      Long id, Long productId, String productName, BigDecimal productPrice, Integer quantity) {
     this.id = id;
     this.productId = productId;
     this.productName = productName;
@@ -37,11 +33,7 @@ public class Inventory {
     this.quantity = quantity;
   }
 
-  public Inventory(
-      final Long productId,
-      final String productName,
-      final BigDecimal productPrice,
-      final Integer quantity) {
+  public Inventory(Long productId, String productName, BigDecimal productPrice, Integer quantity) {
     this.productId = productId;
     this.productName = productName;
     this.productPrice = productPrice;
@@ -52,7 +44,7 @@ public class Inventory {
     return id;
   }
 
-  public void setId(final Long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -60,7 +52,7 @@ public class Inventory {
     return productId;
   }
 
-  public void setProductId(final Long productId) {
+  public void setProductId(Long productId) {
     this.productId = productId;
   }
 
@@ -68,7 +60,7 @@ public class Inventory {
     return productName;
   }
 
-  public void setProductName(final String productName) {
+  public void setProductName(String productName) {
     this.productName = productName;
   }
 
@@ -76,7 +68,7 @@ public class Inventory {
     return productPrice;
   }
 
-  public void setProductPrice(final BigDecimal productPrice) {
+  public void setProductPrice(BigDecimal productPrice) {
     this.productPrice = productPrice;
   }
 
@@ -84,7 +76,7 @@ public class Inventory {
     return quantity;
   }
 
-  public void setQuantity(final Integer quantity) {
+  public void setQuantity(Integer quantity) {
     this.quantity = quantity;
   }
 

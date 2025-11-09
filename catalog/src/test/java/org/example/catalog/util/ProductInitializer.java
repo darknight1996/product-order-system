@@ -17,8 +17,8 @@ public class ProductInitializer {
   }
 
   public static Product createUpdatedProduct() {
-    final Product updatedProduct = createProduct();
-    final BigDecimal updatedPrice = updatedProduct.getPrice().add(BigDecimal.valueOf(2000));
+    Product updatedProduct = createProduct();
+    BigDecimal updatedPrice = updatedProduct.getPrice().add(BigDecimal.valueOf(2000));
 
     updatedProduct.setPrice(updatedPrice);
     updatedProduct.setName("updated product");
