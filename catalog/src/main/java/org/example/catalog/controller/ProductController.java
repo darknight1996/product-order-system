@@ -37,16 +37,16 @@ public class ProductController {
 
   @GetMapping("/{id}")
   public ResponseEntity<Product> getById(@PathVariable Long id) {
-    final Product product = productService.getById(id);
+    Product product = productService.getById(id);
 
     return ResponseEntity.ok(product);
   }
 
   @PostMapping
   public ResponseEntity<Product> add(@RequestBody ProductAddDTO productAddDTO) {
-    final Product product = productMapper.productFromProductAddDto(productAddDTO);
+    Product product = productMapper.productFromProductAddDto(productAddDTO);
 
-    final Product savedProduct = productService.add(product);
+    Product savedProduct = productService.add(product);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
   }
