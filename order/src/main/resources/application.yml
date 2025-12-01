@@ -1,11 +1,19 @@
 spring:
   application:
     name: order
+
   datasource:
-    url: jdbc:h2:mem:db
-    driverClassName: org.h2.Driver
-    username: sa
-    password: password
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/pos-order}
+    username: ${SPRING_DATASOURCE_USERNAME:pgadmin}
+    password: ${SPRING_DATASOURCE_PASSWORD:pgadmin}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
 inventory:
   url: http://localhost:8082

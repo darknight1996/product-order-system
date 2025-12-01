@@ -1,13 +1,24 @@
 spring:
   application:
     name: catalog
+
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
   datasource:
-    url: jdbc:h2:mem:db
-    driverClassName: org.h2.Driver
-    username: sa
-    password: password
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/pos-catalog}
+    username: ${SPRING_DATASOURCE_USERNAME:pgadmin}
+    password: ${SPRING_DATASOURCE_PASSWORD:pgadmin}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect

@@ -1,6 +1,18 @@
 version: "3.9"
 
 services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypass
+    volumes:
+      - ./postgres-init:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
@@ -27,36 +39,46 @@ services:
     build:
       context: .
       dockerfile: ./catalog/Dockerfile
-    container_name: catalog
-    ports:
-      - "8080:8080"
     environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/catalog_db
+      SPRING_DATASOURCE_USERNAME: catalog_user
+      SPRING_DATASOURCE_PASSWORD: catalog_pass
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - kafka
+      - postgres
+    ports:
+      - "8080:8080"
 
   order:
     build:
       context: .
       dockerfile: ./order/Dockerfile
-    container_name: order
-    ports:
-      - "8081:8080"
     environment:
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/order_db
+      SPRING_DATASOURCE_USERNAME: order_user
+      SPRING_DATASOURCE_PASSWORD: order_pass
       INVENTORY_URL: http://inventory:8080
       CATALOG_URL: http://catalog:8080
     depends_on:
-      - kafka
+      - postgres
+    ports:
+      - "8081:8080"
 
   inventory:
     build:
       context: .
       dockerfile: ./inventory/Dockerfile
-    container_name: inventory
-    ports:
-      - "8082:8080"
     environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/inventory_db
+      SPRING_DATASOURCE_USERNAME: inventory_user
+      SPRING_DATASOURCE_PASSWORD: inventory_pass
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - kafka
+      - postgres
+    ports:
+      - "8082:8080"
+
+volumes:
+  postgres_data:
