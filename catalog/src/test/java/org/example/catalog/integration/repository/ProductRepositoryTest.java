@@ -66,11 +66,23 @@ class ProductRepositoryTest {
 
   private List<Product> getProducts() {
     return List.of(
-        new Product("product 1", "description 1", BigDecimal.valueOf(1000)),
-        new Product("product 2", "description 2", BigDecimal.valueOf(2000)));
+        Product.builder()
+            .name("product 1")
+            .description("description 1")
+            .price(BigDecimal.valueOf(1000))
+            .build(),
+        Product.builder()
+            .name("product 2")
+            .description("description 2")
+            .price(BigDecimal.valueOf(2000))
+            .build());
   }
 
   private Product getProduct() {
-    return new Product("product", "description", BigDecimal.valueOf(1000));
+    return Product.builder()
+        .name("product")
+        .description("description")
+        .price(BigDecimal.valueOf(1000))
+        .build();
   }
 }

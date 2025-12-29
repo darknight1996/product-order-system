@@ -22,3 +22,8 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+app:
+  kafka:
+    topics:
+      product-events: product-events

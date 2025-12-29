@@ -20,20 +20,42 @@ repositories {
 }
 
 dependencies {
+    // Spring
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-validation"
+
+    // Kafka
     implementation "org.springframework.kafka:spring-kafka"
+
+    // Postgres
     implementation "org.postgresql:postgresql:42.7.3"
 
+    // Internal libs
     implementation "org.example:message:1.0-SNAPSHOT"
 
+    // Lombok
+    compileOnly "org.projectlombok:lombok"
+    annotationProcessor "org.projectlombok:lombok"
+    testCompileOnly "org.projectlombok:lombok"
+    testAnnotationProcessor "org.projectlombok:lombok"
+
+    // Mapstruct
     def mapStructVersion = "1.6.3"
     implementation "org.mapstruct:mapstruct:$mapStructVersion"
     annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
 
+    // Test
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.mockito:mockito-core:5.14.2"
+
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+    testRuntimeOnly "com.h2database:h2"
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
 jacoco {
@@ -46,11 +68,12 @@ jacocoTestCoverageVerification {
         rule {
             element = "CLASS"
             excludes = [
-                    "**/dto/**",
-                    "**/entity/**",
-                    "**/init/**",
-                    "**/mapper/**",
-                    "**/CatalogApplication.class"
+                    "**.dto.**",
+                    "**.entity.**",
+                    "**.init.**",
+                    "**.mapper.**",
+                    "**.exception.**",
+                    "**.CatalogApplication"
             ]
             limit {
                 minimum = 0.80

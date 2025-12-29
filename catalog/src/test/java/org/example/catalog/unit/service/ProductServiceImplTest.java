@@ -2,19 +2,17 @@ package org.example.catalog.unit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import org.example.catalog.entity.Product;
+import org.example.catalog.mapper.ProductMapper;
 import org.example.catalog.message.ProductMessageService;
 import org.example.catalog.repository.ProductRepository;
 import org.example.catalog.service.impl.ProductServiceImpl;
-import org.example.catalog.util.ProductInitializer;
+import org.example.catalog.unit.util.ProductInitializer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -30,8 +28,8 @@ class ProductServiceImplTest {
   private static final List<Product> PRODUCTS = ProductInitializer.createProducts();
 
   @Mock private ProductRepository productRepository;
-
   @Mock private ProductMessageService productMessageService;
+  @Mock private ProductMapper productMapper;
 
   @InjectMocks private ProductServiceImpl cut;
 
@@ -42,7 +40,6 @@ class ProductServiceImplTest {
     List<Product> result = cut.getAll();
 
     assertEquals(PRODUCTS, result);
-
     verify(productRepository, times(1)).findAll();
   }
 
@@ -53,7 +50,6 @@ class ProductServiceImplTest {
     Product result = cut.getById(PRODUCT.getId());
 
     assertEquals(PRODUCT, result);
-
     verify(productRepository, times(1)).findById(PRODUCT.getId());
   }
 
@@ -62,7 +58,6 @@ class ProductServiceImplTest {
     when(productRepository.findById(PRODUCT.getId())).thenReturn(Optional.empty());
 
     assertThrows(EntityNotFoundException.class, () -> cut.getById(PRODUCT.getId()));
-
     verify(productRepository, times(1)).findById(PRODUCT.getId());
   }
 
@@ -84,7 +79,7 @@ class ProductServiceImplTest {
 
     cut.delete(PRODUCT.getId());
 
-    verify(productRepository, times(1)).deleteById(PRODUCT.getId());
+    verify(productRepository, times(1)).delete(PRODUCT);
     verify(productMessageService, times(1)).sendDelete(PRODUCT);
   }
 
@@ -94,24 +89,25 @@ class ProductServiceImplTest {
 
     assertThrows(EntityNotFoundException.class, () -> cut.delete(PRODUCT.getId()));
 
-    verify(productRepository, never()).deleteById(PRODUCT.getId());
-    verify(productMessageService, never()).sendDelete(PRODUCT);
+    verify(productRepository, never()).delete(any());
+    verify(productMessageService, never()).sendDelete(any());
   }
 
   @Test
   void update_shouldUpdateProduct() {
     when(productRepository.findById(PRODUCT.getId())).thenReturn(Optional.of(PRODUCT));
-    when(productRepository.save(PRODUCT)).thenReturn(UPDATED_PRODUCT);
+    when(productRepository.save(any(Product.class))).thenReturn(UPDATED_PRODUCT);
 
     Product result = cut.update(UPDATED_PRODUCT);
 
     assertEquals(UPDATED_PRODUCT, result);
 
+    verify(productMapper).updateProductFromProduct(UPDATED_PRODUCT, PRODUCT);
+
     ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
     verify(productRepository, times(1)).save(productCaptor.capture());
-    Product capturedProduct = productCaptor.getValue();
 
-    assertEquals(UPDATED_PRODUCT, capturedProduct);
+    assertEquals(PRODUCT, productCaptor.getValue());
 
     verify(productMessageService, times(1)).sendUpdate(UPDATED_PRODUCT);
   }
@@ -122,7 +118,7 @@ class ProductServiceImplTest {
 
     assertThrows(EntityNotFoundException.class, () -> cut.update(PRODUCT));
 
-    verify(productRepository, never()).save(PRODUCT);
-    verify(productMessageService, never()).sendUpdate(PRODUCT);
+    verify(productRepository, never()).save(any());
+    verify(productMessageService, never()).sendUpdate(any());
   }
 }

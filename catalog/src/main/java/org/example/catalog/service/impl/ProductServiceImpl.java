@@ -2,24 +2,25 @@ package org.example.catalog.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.catalog.entity.Product;
+import org.example.catalog.mapper.ProductMapper;
 import org.example.catalog.message.ProductMessageService;
 import org.example.catalog.repository.ProductRepository;
 import org.example.catalog.service.ProductService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
 
   private final ProductRepository productRepository;
-
   private final ProductMessageService productMessageService;
-
-  public ProductServiceImpl(
-      ProductRepository productRepository, ProductMessageService productMessageService) {
-    this.productRepository = productRepository;
-    this.productMessageService = productMessageService;
-  }
+  private final ProductMapper productMapper;
 
   @Override
   public List<Product> getAll() {
@@ -32,7 +33,10 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
+  @Transactional
   public Product add(Product product) {
+    log.info("Creating new product: {}", product.getName());
+
     Product savedProduct = productRepository.save(product);
 
     productMessageService.sendAdd(savedProduct);
@@ -41,21 +45,27 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
+  @Transactional
   public void delete(Long id) {
-    final Product existedProduct = getExistedProduct(id);
+    log.info("Deleting product with id: {}", id);
 
-    productRepository.deleteById(id);
+    Product existedProduct = getExistedProduct(id);
+
+    productRepository.delete(existedProduct);
 
     productMessageService.sendDelete(existedProduct);
   }
 
   @Override
+  @Transactional
   public Product update(Product product) {
-    Product existedProduct = getExistedProduct(product.getId());
+    Long id = product.getId();
 
-    existedProduct.setName(product.getName());
-    existedProduct.setDescription(product.getDescription());
-    existedProduct.setPrice(product.getPrice());
+    log.info("Updating product with id: {}", id);
+
+    Product existedProduct = getExistedProduct(id);
+
+    productMapper.updateProductFromProduct(product, existedProduct);
 
     Product savedProduct = productRepository.save(existedProduct);
 
@@ -64,9 +74,14 @@ public class ProductServiceImpl implements ProductService {
     return savedProduct;
   }
 
+  @Override
+  public long count() {
+    return productRepository.count();
+  }
+
   private Product getExistedProduct(Long id) {
     return productRepository
         .findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+        .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + id));
   }
 }
