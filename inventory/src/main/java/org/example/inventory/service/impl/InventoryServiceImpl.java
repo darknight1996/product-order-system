@@ -1,22 +1,27 @@
 package org.example.inventory.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.inventory.dto.OrderDTO;
 import org.example.inventory.entity.Inventory;
+import org.example.inventory.exception.InsufficientStockException;
 import org.example.inventory.repository.InventoryRepository;
 import org.example.inventory.service.InventoryService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class InventoryServiceImpl implements InventoryService {
 
-  private final InventoryRepository inventoryRepository;
+  private static final Integer DEFAULT_QUANTITY = 0;
 
-  public InventoryServiceImpl(InventoryRepository inventoryRepository) {
-    this.inventoryRepository = inventoryRepository;
-  }
+  private final InventoryRepository inventoryRepository;
 
   @Override
   public List<Inventory> getAll() {
@@ -24,59 +29,90 @@ public class InventoryServiceImpl implements InventoryService {
   }
 
   @Override
-  public Inventory getById(Long id) {
-    return getExistedInventory(id);
-  }
-
-  @Override
-  public Inventory add(Inventory inventory) {
-    return inventoryRepository.save(inventory);
-  }
-
-  @Override
-  public void delete(Long id) {
-    final Inventory existedInventory = getExistedInventory(id);
-
-    inventoryRepository.delete(existedInventory);
-  }
-
-  @Override
+  @Transactional
   public Inventory updateQuantity(Long id, Integer quantity) {
-    Inventory existedInventory = getExistedInventory(id);
+    Inventory inventory = findByIdOrThrow(id);
 
-    existedInventory.setQuantity(quantity);
+    inventory.setQuantity(quantity);
 
-    return inventoryRepository.save(existedInventory);
+    log.info("Updated quantity for inventory id: {} to {}", id, quantity);
+    return inventory;
   }
 
   @Override
   @Transactional
-  public boolean adjustInventory(OrderDTO orderDTO) {
-    Long orderProductId = orderDTO.getProductId();
-    Integer orderQuantity = orderDTO.getQuantity();
+  public void adjustInventory(OrderDTO orderDTO) {
+    Long productId = orderDTO.productId();
+    Integer requestedQuantity = orderDTO.quantity();
+    Inventory inventory = findByProductIdOrThrow(productId);
 
-    Inventory inventory = getExistedInventoryByProductId(orderProductId);
-    Integer inventoryQuantity = inventory.getQuantity();
-
-    if (inventoryQuantity < orderQuantity) {
-      return false;
+    if (inventory.getQuantity() < requestedQuantity) {
+      throw new InsufficientStockException(
+          String.format(
+              "Not enough stock for productId: %s. Available: %d, Requested: %d",
+              productId, inventory.getQuantity(), requestedQuantity));
     }
 
-    inventory.setQuantity(inventoryQuantity - orderQuantity);
+    inventory.setQuantity(inventory.getQuantity() - requestedQuantity);
+
+    log.info(
+        "Adjusted inventory for productId: {}. New quantity: {}",
+        productId,
+        inventory.getQuantity());
+  }
+
+  @Override
+  @Transactional
+  public void createInventory(Long productId, String productName, BigDecimal productPrice) {
+    if (inventoryRepository.findByProductId(productId).isPresent()) {
+      log.warn("Inventory for productId={} already exists. Skipping creation.", productId);
+      return;
+    }
+
+    Inventory inventory =
+        Inventory.builder()
+            .productId(productId)
+            .productName(productName)
+            .productPrice(productPrice)
+            .quantity(DEFAULT_QUANTITY)
+            .build();
+
     inventoryRepository.save(inventory);
 
-    return true;
+    log.info("Created inventory for productId={}", productId);
   }
 
-  private Inventory getExistedInventory(Long id) {
+  @Override
+  @Transactional
+  public void updateProductDetails(Long productId, String productName, BigDecimal productPrice) {
+    Inventory inventory = findByProductIdOrThrow(productId);
+
+    inventory.setProductName(productName);
+    inventory.setProductPrice(productPrice);
+
+    log.info("Updated product details for productId={}", productId);
+  }
+
+  @Override
+  @Transactional
+  public void deleteByProductId(Long productId) {
+    Inventory inventory = findByProductIdOrThrow(productId);
+
+    inventoryRepository.delete(inventory);
+
+    log.info("Deleted inventory for productId={}", productId);
+  }
+
+  private Inventory findByIdOrThrow(Long id) {
     return inventoryRepository
         .findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("Inventory not found"));
+        .orElseThrow(() -> new EntityNotFoundException("Inventory not found with id: " + id));
   }
 
-  private Inventory getExistedInventoryByProductId(Long productId) {
+  private Inventory findByProductIdOrThrow(Long productId) {
     return inventoryRepository
         .findByProductId(productId)
-        .orElseThrow(() -> new EntityNotFoundException("Inventory not found"));
+        .orElseThrow(
+            () -> new EntityNotFoundException("Inventory not found for productId: " + productId));
   }
 }

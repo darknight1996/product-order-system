@@ -17,6 +17,7 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:pgadmin}
     password: ${SPRING_DATASOURCE_PASSWORD:pgadmin}
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -24,5 +25,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+app:
+  kafka:
+    topics:
+      product-events: product-events
 
 

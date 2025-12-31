@@ -1,51 +1,44 @@
 package org.example.inventory.controller;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.example.inventory.dto.InventoryResponseDTO;
 import org.example.inventory.dto.InventoryUpdateDTO;
 import org.example.inventory.dto.OrderDTO;
 import org.example.inventory.entity.Inventory;
+import org.example.inventory.mapper.InventoryMapper;
 import org.example.inventory.service.InventoryService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/inventory")
+@RequiredArgsConstructor
 public class InventoryController {
 
   private final InventoryService inventoryService;
+  private final InventoryMapper inventoryMapper;
 
-  public InventoryController(InventoryService inventoryService) {
-    this.inventoryService = inventoryService;
-  }
+  @GetMapping
+  public ResponseEntity<List<InventoryResponseDTO>> getAll() {
+    List<Inventory> inventoryList = inventoryService.getAll();
 
-  @GetMapping("/all")
-  public ResponseEntity<List<Inventory>> getAll() {
-    return ResponseEntity.ok().body(inventoryService.getAll());
+    return ResponseEntity.ok(inventoryMapper.toInventoryResponseDTOList(inventoryList));
   }
 
   @PutMapping
-  public ResponseEntity<Inventory> update(@RequestBody InventoryUpdateDTO inventoryUpdateDTO) {
+  public ResponseEntity<InventoryResponseDTO> update(
+      @RequestBody InventoryUpdateDTO inventoryUpdateDTO) {
     Inventory inventory =
-        inventoryService.updateQuantity(
-            inventoryUpdateDTO.getId(), inventoryUpdateDTO.getQuantity());
+        inventoryService.updateQuantity(inventoryUpdateDTO.id(), inventoryUpdateDTO.quantity());
 
-    return ResponseEntity.ok().body(inventory);
+    return ResponseEntity.ok(inventoryMapper.toInventoryResponseDTO(inventory));
   }
 
   @PostMapping("/adjust")
   public ResponseEntity<String> adjustInventory(@RequestBody OrderDTO orderDTO) {
-    boolean success = inventoryService.adjustInventory(orderDTO);
+    inventoryService.adjustInventory(orderDTO);
 
-    if (success) {
-      return ResponseEntity.ok("Inventory adjusted successfully.");
-    } else {
-      return ResponseEntity.status(HttpStatus.CONFLICT).body("Insufficient inventory.");
-    }
+    return ResponseEntity.ok("Inventory adjusted successfully.");
   }
 }

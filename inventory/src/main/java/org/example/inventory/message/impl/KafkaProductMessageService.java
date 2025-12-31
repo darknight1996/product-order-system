@@ -1,29 +1,34 @@
 package org.example.inventory.message.impl;
 
-import jakarta.transaction.Transactional;
-import java.util.Optional;
-import org.example.inventory.entity.Inventory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.inventory.message.ProductMessageService;
-import org.example.inventory.repository.InventoryRepository;
+import org.example.inventory.service.InventoryService;
 import org.example.message.ActionType;
 import org.example.message.Product;
 import org.example.message.ProductEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class KafkaProductMessageService implements ProductMessageService {
 
-  private final InventoryRepository inventoryRepository;
-
-  public KafkaProductMessageService(InventoryRepository inventoryRepository) {
-    this.inventoryRepository = inventoryRepository;
-  }
+  private final InventoryService inventoryService;
 
   @Override
   @Transactional
-  @KafkaListener(topics = "product-events", groupId = "inventory-consumer-group")
+  @KafkaListener(
+      topics = "${app.kafka.topics.product-events}",
+      groupId = "${spring.kafka.consumer.group-id}")
   public void productEvent(ProductEvent productEvent) {
+    log.info(
+        "Received ProductEvent: action={}, productId={}",
+        productEvent.getActionType(),
+        productEvent.getProduct().getId());
+
     ActionType actionType = productEvent.getActionType();
     Product product = productEvent.getProduct();
 
@@ -31,37 +36,26 @@ public class KafkaProductMessageService implements ProductMessageService {
       case ADD -> add(product);
       case DELETE -> delete(product);
       case UPDATE -> update(product);
+
+      default -> log.warn("Received unknown action type: {}", actionType);
     }
   }
 
   private void add(Product product) {
-    Long productId = product.getId();
-    Optional<Inventory> existedInventory = inventoryRepository.findByProductId(productId);
+    inventoryService.createInventory(product.getId(), product.getName(), product.getPrice());
 
-    if (existedInventory.isEmpty()) {
-      Inventory inventory = new Inventory(productId, product.getName(), product.getPrice(), 0);
-
-      inventoryRepository.save(inventory);
-    }
-  }
-
-  private void delete(Product product) {
-    Long productId = product.getId();
-
-    inventoryRepository.deleteByProductId(productId);
+    log.info("Created new Inventory for productId={}", product.getId());
   }
 
   private void update(Product product) {
-    Long productId = product.getId();
-    Optional<Inventory> existedInventory = inventoryRepository.findByProductId(productId);
+    inventoryService.updateProductDetails(product.getId(), product.getName(), product.getPrice());
 
-    if (existedInventory.isPresent()) {
-      Inventory inventory = existedInventory.get();
+    log.info("Updated Inventory for productId={}", product.getId());
+  }
 
-      inventory.setProductName(product.getName());
-      inventory.setProductPrice(product.getPrice());
+  private void delete(Product product) {
+    inventoryService.deleteByProductId(product.getId());
 
-      inventoryRepository.save(inventory);
-    }
+    log.info("Deleted Inventory for productId={}", product.getId());
   }
 }

@@ -1,97 +1,70 @@
 package org.example.inventory.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.proxy.HibernateProxy;
 
 @Entity
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table(name = "inventory")
 public class Inventory {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(nullable = false)
   private Long productId;
 
+  // TODO: probably useless fields(productName, productPrice), because duplicating data from catalog
   private String productName;
 
   private BigDecimal productPrice;
 
+  @Column(nullable = false)
   private Integer quantity;
 
-  public Inventory() {}
+  @Override
+  public final boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null) return false;
 
-  public Inventory(
-      Long id, Long productId, String productName, BigDecimal productPrice, Integer quantity) {
-    this.id = id;
-    this.productId = productId;
-    this.productName = productName;
-    this.productPrice = productPrice;
-    this.quantity = quantity;
-  }
+    Class<?> oEffectiveClass =
+        o instanceof HibernateProxy
+            ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass()
+            : o.getClass();
+    Class<?> thisEffectiveClass =
+        this instanceof HibernateProxy
+            ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
+            : this.getClass();
 
-  public Inventory(Long productId, String productName, BigDecimal productPrice, Integer quantity) {
-    this.productId = productId;
-    this.productName = productName;
-    this.productPrice = productPrice;
-    this.quantity = quantity;
-  }
+    if (thisEffectiveClass != oEffectiveClass) return false;
 
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public Long getProductId() {
-    return productId;
-  }
-
-  public void setProductId(Long productId) {
-    this.productId = productId;
-  }
-
-  public String getProductName() {
-    return productName;
-  }
-
-  public void setProductName(String productName) {
-    this.productName = productName;
-  }
-
-  public BigDecimal getProductPrice() {
-    return productPrice;
-  }
-
-  public void setProductPrice(BigDecimal productPrice) {
-    this.productPrice = productPrice;
-  }
-
-  public Integer getQuantity() {
-    return quantity;
-  }
-
-  public void setQuantity(Integer quantity) {
-    this.quantity = quantity;
+    Inventory inventory = (Inventory) o;
+    return getId() != null && Objects.equals(getId(), inventory.getId());
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (!(o instanceof Inventory inventory)) return false;
-    return Objects.equals(id, inventory.id)
-        && Objects.equals(productId, inventory.productId)
-        && Objects.equals(productName, inventory.productName)
-        && Objects.equals(productPrice, inventory.productPrice)
-        && Objects.equals(quantity, inventory.quantity);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(id, productId, productName, productPrice, quantity);
+  public final int hashCode() {
+    return this instanceof HibernateProxy
+        ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode()
+        : getClass().hashCode();
   }
 }

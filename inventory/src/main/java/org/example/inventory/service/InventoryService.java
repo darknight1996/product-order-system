@@ -1,5 +1,6 @@
 package org.example.inventory.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import org.example.inventory.dto.OrderDTO;
 import org.example.inventory.entity.Inventory;
@@ -10,13 +11,13 @@ public interface InventoryService {
 
   List<Inventory> getAll();
 
-  Inventory getById(Long id);
-
-  Inventory add(Inventory inventory);
-
-  void delete(Long id);
-
   Inventory updateQuantity(Long id, Integer quantity);
 
-  boolean adjustInventory(OrderDTO orderDTO);
+  void adjustInventory(OrderDTO orderDTO);
+
+  void createInventory(Long productId, String productName, BigDecimal productPrice);
+
+  void updateProductDetails(Long productId, String productName, BigDecimal productPrice);
+
+  void deleteByProductId(Long productId);
 }
