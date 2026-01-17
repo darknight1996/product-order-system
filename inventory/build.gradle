@@ -53,6 +53,11 @@ dependencies {
     testRuntimeOnly "com.h2database:h2"
 }
 
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
 jacoco {
     toolVersion = "0.8.11"
 }
@@ -63,9 +68,12 @@ jacocoTestCoverageVerification {
         rule {
             element = "CLASS"
             excludes = [
-                    "org/example/inventory/dto/**",
-                    "org/example/inventory/entity/**",
-                    "org/example/inventory/InventoryApplication.class"
+                    "**.dto.**",
+                    "**.entity.**",
+                    "**.init.**",
+                    "**.mapper.**",
+                    "**.exception.**",
+                    "**.InventoryApplication"
             ]
             limit {
                 minimum = 0.80

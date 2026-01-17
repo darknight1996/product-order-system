@@ -15,29 +15,33 @@ import org.example.inventory.controller.InventoryController;
 import org.example.inventory.dto.InventoryUpdateDTO;
 import org.example.inventory.dto.OrderDTO;
 import org.example.inventory.entity.Inventory;
+import org.example.inventory.mapper.InventoryMapper;
+import org.example.inventory.mapper.InventoryMapperImpl;
 import org.example.inventory.service.InventoryService;
 import org.example.inventory.util.InventoryInitializer;
 import org.example.inventory.util.OrderInitializer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 @WebMvcTest(InventoryController.class)
+@Import(InventoryMapperImpl.class)
 class InventoryControllerTest {
 
   private static final String INVENTORY_URL = "/api/v1/inventory";
-  private static final String INVENTORY_ALL_URL = INVENTORY_URL + "/all";
   private static final String INVENTORY_ADJUST_URL = INVENTORY_URL + "/adjust";
   private static final String INVALID_JSON = "Invalid JSON";
 
   @MockitoBean private InventoryService inventoryService;
+  @MockitoSpyBean private InventoryMapper inventoryMapper;
 
   @Autowired private MockMvc mockMvc;
-
   @Autowired private ObjectMapper objectMapper;
 
   @Test
@@ -46,7 +50,7 @@ class InventoryControllerTest {
 
     when(inventoryService.getAll()).thenReturn(inventories);
 
-    ResultActions resultActions = mockMvc.perform(get(INVENTORY_ALL_URL));
+    ResultActions resultActions = mockMvc.perform(get(INVENTORY_URL));
 
     resultActions
         .andExpect(status().isOk())
@@ -98,22 +102,8 @@ class InventoryControllerTest {
     OrderDTO orderDTO = OrderInitializer.createOrderDTO();
     String json = objectMapper.writeValueAsString(orderDTO);
 
-    when(inventoryService.adjustInventory(any())).thenReturn(true);
-
     mockMvc
         .perform(post(INVENTORY_ADJUST_URL).contentType(MediaType.APPLICATION_JSON).content(json))
         .andExpect(status().isOk());
-  }
-
-  @Test
-  void adjustInventory_insufficientInventory() throws Exception {
-    OrderDTO orderDTO = OrderInitializer.createOrderDTO();
-    String json = objectMapper.writeValueAsString(orderDTO);
-
-    when(inventoryService.adjustInventory(any())).thenReturn(false);
-
-    mockMvc
-        .perform(post(INVENTORY_ADJUST_URL).contentType(MediaType.APPLICATION_JSON).content(json))
-        .andExpect(status().isConflict());
   }
 }

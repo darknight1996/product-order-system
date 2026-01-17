@@ -1,22 +1,25 @@
 package org.example.inventory.unit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import org.example.inventory.dto.OrderDTO;
 import org.example.inventory.entity.Inventory;
+import org.example.inventory.exception.InsufficientStockException;
 import org.example.inventory.repository.InventoryRepository;
 import org.example.inventory.service.impl.InventoryServiceImpl;
 import org.example.inventory.util.InventoryInitializer;
+import org.example.inventory.util.ProductInitializer;
+import org.example.message.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,13 +36,11 @@ class InventoryServiceImplTest {
   @InjectMocks private InventoryServiceImpl cut;
 
   private Inventory inventory;
-  private Inventory updatedInventory;
   private List<Inventory> inventories;
 
   @BeforeEach
   void init() {
     inventory = InventoryInitializer.createInventory();
-    updatedInventory = InventoryInitializer.createUpdatedInventory();
     inventories = InventoryInitializer.createInventories();
   }
 
@@ -55,100 +56,108 @@ class InventoryServiceImplTest {
   }
 
   @Test
-  void getById_shouldReturnInventoryById() {
-    when(inventoryRepository.findById(inventory.getId())).thenReturn(Optional.of(inventory));
+  void createInventory_shouldCreateNewInventory_whenNotExists() {
+    Product product = ProductInitializer.createProduct();
 
-    Inventory result = cut.getById(inventory.getId());
+    when(inventoryRepository.findByProductId(product.getId())).thenReturn(Optional.empty());
 
-    assertEquals(inventory, result);
+    cut.createInventory(product.getId(), product.getName(), product.getPrice());
 
-    verify(inventoryRepository, times(1)).findById(inventory.getId());
+    ArgumentCaptor<Inventory> inventoryCaptor = ArgumentCaptor.forClass(Inventory.class);
+
+    verify(inventoryRepository, times(1)).save(inventoryCaptor.capture());
+
+    Inventory captured = inventoryCaptor.getValue();
+
+    assertEquals(product.getId(), captured.getProductId());
+    assertEquals(product.getName(), captured.getProductName());
+    assertEquals(product.getPrice(), captured.getProductPrice());
+    assertEquals(0, captured.getQuantity());
   }
 
   @Test
-  void getByProductId_productNotFound() {
-    when(inventoryRepository.findById(inventory.getId())).thenReturn(Optional.empty());
+  void createInventory_shouldNotCreate_whenAlreadyExists() {
+    when(inventoryRepository.findByProductId(inventory.getProductId()))
+        .thenReturn(Optional.of(inventory));
 
-    assertThrows(EntityNotFoundException.class, () -> cut.getById(inventory.getId()));
+    cut.createInventory(inventory.getProductId(), "Name", BigDecimal.TEN);
 
-    verify(inventoryRepository, times(1)).findById(inventory.getId());
+    verify(inventoryRepository, never()).save(any(Inventory.class));
   }
 
   @Test
-  void add_shouldAddInventory() {
-    when(inventoryRepository.save(inventory)).thenReturn(inventory);
+  void deleteByProductId_shouldDeleteInventory() {
+    when(inventoryRepository.findByProductId(inventory.getProductId()))
+        .thenReturn(Optional.of(inventory));
 
-    Inventory result = cut.add(inventory);
-
-    assertEquals(inventory, result);
-
-    verify(inventoryRepository, times(1)).save(inventory);
-  }
-
-  @Test
-  void delete_shouldDeleteInventory() {
-    when(inventoryRepository.findById(inventory.getId())).thenReturn(Optional.of(inventory));
-
-    cut.delete(inventory.getId());
+    cut.deleteByProductId(inventory.getProductId());
 
     verify(inventoryRepository, times(1)).delete(inventory);
   }
 
   @Test
-  void delete_productNotFound() {
-    when(inventoryRepository.findById(inventory.getId())).thenReturn(Optional.empty());
+  void deleteByProductId_shouldThrow_whenNotFound() {
+    Long productId = inventory.getProductId();
 
-    assertThrows(EntityNotFoundException.class, () -> cut.delete(inventory.getId()));
+    when(inventoryRepository.findByProductId(productId)).thenReturn(Optional.empty());
 
-    verify(inventoryRepository, never()).deleteById(inventory.getId());
+    assertThrows(EntityNotFoundException.class, () -> cut.deleteByProductId(productId));
+
+    verify(inventoryRepository, never()).delete(any());
   }
 
   @Test
-  void updateQuantity_shouldUpdateInventoryQuantity() {
+  void updateQuantity_shouldUpdateAndReturnInventory() {
+    Integer newQuantity = 50;
+
     when(inventoryRepository.findById(inventory.getId())).thenReturn(Optional.of(inventory));
-    when(inventoryRepository.save(inventory)).thenReturn(updatedInventory);
 
-    Inventory result = cut.updateQuantity(updatedInventory.getId(), updatedInventory.getQuantity());
+    Inventory result = cut.updateQuantity(inventory.getId(), newQuantity);
 
-    assertEquals(updatedInventory, result);
-
-    ArgumentCaptor<Inventory> inventoryCaptor = ArgumentCaptor.forClass(Inventory.class);
-    verify(inventoryRepository, times(1)).save(inventoryCaptor.capture());
-    Inventory capturedInventory = inventoryCaptor.getValue();
-
-    assertEquals(updatedInventory, capturedInventory);
+    assertEquals(newQuantity, result.getQuantity());
+    assertEquals(inventory, result);
   }
 
   @Test
-  void adjustInventory_shouldAdjustInventory() {
+  void updateProductDetails_shouldUpdateDetails() {
+    String newName = "Updated Name";
+    BigDecimal newPrice = BigDecimal.valueOf(99.99);
+
     when(inventoryRepository.findByProductId(inventory.getProductId()))
         .thenReturn(Optional.of(inventory));
 
-    OrderDTO orderDTO = new OrderDTO(inventory.getProductId(), inventory.getQuantity() - 1);
-    Integer expectedQuantity = inventory.getQuantity() - orderDTO.getQuantity();
+    cut.updateProductDetails(inventory.getProductId(), newName, newPrice);
 
-    boolean result = cut.adjustInventory(orderDTO);
-
-    assertTrue(result);
-
-    ArgumentCaptor<Inventory> inventoryCaptor = ArgumentCaptor.forClass(Inventory.class);
-    verify(inventoryRepository, times(1)).save(inventoryCaptor.capture());
-    Inventory capturedInventory = inventoryCaptor.getValue();
-
-    assertEquals(expectedQuantity, capturedInventory.getQuantity());
+    assertEquals(newName, inventory.getProductName());
+    assertEquals(newPrice, inventory.getProductPrice());
   }
 
   @Test
-  void adjustInventory_insufficientInventory() {
+  void adjustInventory_shouldDeductQuantity_whenStockSufficient() {
+    inventory.setQuantity(10);
+    int deductAmount = 4;
+
+    OrderDTO orderDTO = new OrderDTO(inventory.getProductId(), deductAmount);
+
     when(inventoryRepository.findByProductId(inventory.getProductId()))
         .thenReturn(Optional.of(inventory));
 
-    OrderDTO orderDTO = new OrderDTO(inventory.getProductId(), inventory.getQuantity() + 1);
+    cut.adjustInventory(orderDTO);
 
-    boolean result = cut.adjustInventory(orderDTO);
+    assertEquals(6, inventory.getQuantity());
+  }
 
-    assertFalse(result);
+  @Test
+  void adjustInventory_shouldThrowException_whenInsufficientStock() {
+    inventory.setQuantity(5);
+    int requestAmount = 6;
+    OrderDTO orderDTO = new OrderDTO(inventory.getProductId(), requestAmount);
 
-    verify(inventoryRepository, never()).save(inventory);
+    when(inventoryRepository.findByProductId(inventory.getProductId()))
+        .thenReturn(Optional.of(inventory));
+
+    assertThrows(InsufficientStockException.class, () -> cut.adjustInventory(orderDTO));
+
+    assertEquals(5, inventory.getQuantity());
   }
 }
