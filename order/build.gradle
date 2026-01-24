@@ -2,6 +2,8 @@ plugins {
     id "java"
     id "org.springframework.boot" version "3.4.0"
     id "io.spring.dependency-management" version "1.1.6"
+
+    id "jacoco"
 }
 
 group = "org.example"
@@ -14,16 +16,88 @@ java {
 
 repositories {
     mavenCentral()
+    mavenLocal()
+}
+
+ext {
+    set('springCloudVersion', "2024.0.0")
 }
 
 dependencies {
+    // Spring
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+
+    // Feign
+    implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
+
+    // Postgres
     implementation "org.postgresql:postgresql:42.7.3"
 
-    implementation "org.slf4j:slf4j-api:2.0.16"
+    // Internal libs
+    implementation "org.example:message:1.0-SNAPSHOT"
 
+    // Lombok
+    compileOnly "org.projectlombok:lombok"
+    annotationProcessor "org.projectlombok:lombok"
+    testCompileOnly "org.projectlombok:lombok"
+    testAnnotationProcessor "org.projectlombok:lombok"
+
+    // Mapstruct
+    def mapStructVersion = "1.6.3"
+    implementation "org.mapstruct:mapstruct:$mapStructVersion"
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
+
+    // Test
     testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.mockito:mockito-core:5.14.2"
+
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+    testRuntimeOnly "com.h2database:h2"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+jacocoTestCoverageVerification {
+    dependsOn test
+    violationRules {
+        rule {
+            element = "CLASS"
+            excludes = [
+                    "**.dto.**",
+                    "**.entity.**",
+                    "**.init.**",
+                    "**.mapper.**",
+                    "**.exception.**",
+                    "**.InventoryApplication"
+            ]
+            limit {
+                minimum = 0.80
+            }
+        }
+    }
+}
+
+check {
+    dependsOn("jacocoTestCoverageVerification")
+}
+
+build {
+    dependsOn("check")
 }
 
 bootJar {

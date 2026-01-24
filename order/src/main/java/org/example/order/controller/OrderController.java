@@ -1,33 +1,37 @@
 package org.example.order.controller;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.example.order.dto.OrderAddDTO;
+import org.example.order.dto.OrderResponseDTO;
 import org.example.order.entity.Order;
+import org.example.order.mapper.OrderMapper;
 import org.example.order.service.OrderService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/order")
+@RequestMapping("/api/v1/orders")
+@RequiredArgsConstructor
 public class OrderController {
 
   private final OrderService orderService;
+  private final OrderMapper orderMapper;
 
-  public OrderController(OrderService orderService) {
-    this.orderService = orderService;
-  }
+  @GetMapping
+  public ResponseEntity<List<OrderResponseDTO>> getAll() {
+    List<Order> orders = orderService.getAll();
 
-  @GetMapping("/all")
-  public ResponseEntity<List<Order>> getAll() {
-    return ResponseEntity.ok(orderService.getAll());
+    return ResponseEntity.ok(orderMapper.toDtoList(orders));
   }
 
   @PostMapping
-  public ResponseEntity<Order> add(@RequestBody OrderAddDTO orderAddDTO) {
-    return ResponseEntity.ok(orderService.addOrder(orderAddDTO));
+  public ResponseEntity<OrderResponseDTO> add(@RequestBody OrderAddDTO orderAddDTO) {
+    Order createdOrder = orderService.addOrder(orderAddDTO);
+
+    OrderResponseDTO response = orderMapper.toDto(createdOrder);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 }

@@ -1,64 +1,73 @@
 package org.example.order.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Objects;
+import lombok.*;
+import org.example.order.entity.enums.OrderStatus;
+import org.hibernate.proxy.HibernateProxy;
 
 @Entity
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "orders")
 public class Order {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(nullable = false)
   private Long productId;
 
+  @Column(nullable = false)
   private Integer quantity;
 
+  @Column(nullable = false)
   private BigDecimal totalCost;
 
-  public Order() {}
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private OrderStatus status;
 
-  public Order(Long id, Long productId, Integer quantity, BigDecimal totalCost) {
-    this.id = id;
-    this.productId = productId;
-    this.quantity = quantity;
-    this.totalCost = totalCost;
+  @Column(nullable = false, updatable = false)
+  private LocalDateTime createdAt;
+
+  @PrePersist
+  protected void onCreate() {
+    this.createdAt = LocalDateTime.now();
+
+    if (this.status == null) {
+      this.status = OrderStatus.CREATED;
+    }
   }
 
-  public Long getId() {
-    return id;
+  @Override
+  public final boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null) return false;
+    Class<?> oEffectiveClass =
+        o instanceof HibernateProxy
+            ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass()
+            : o.getClass();
+    Class<?> thisEffectiveClass =
+        this instanceof HibernateProxy
+            ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
+            : this.getClass();
+    if (thisEffectiveClass != oEffectiveClass) return false;
+    Order order = (Order) o;
+    return getId() != null && Objects.equals(getId(), order.getId());
   }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public Long getProductId() {
-    return productId;
-  }
-
-  public void setProductId(Long productId) {
-    this.productId = productId;
-  }
-
-  public Integer getQuantity() {
-    return quantity;
-  }
-
-  public void setQuantity(Integer quantity) {
-    this.quantity = quantity;
-  }
-
-  public BigDecimal getTotalCost() {
-    return totalCost;
-  }
-
-  public void setTotalCost(BigDecimal totalCost) {
-    this.totalCost = totalCost;
+  @Override
+  public final int hashCode() {
+    return this instanceof HibernateProxy
+        ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode()
+        : getClass().hashCode();
   }
 }
