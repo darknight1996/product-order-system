@@ -83,7 +83,7 @@ jacocoTestCoverageVerification {
                     "**.init.**",
                     "**.mapper.**",
                     "**.exception.**",
-                    "**.InventoryApplication"
+                    "**.OrderApplication"
             ]
             limit {
                 minimum = 0.80

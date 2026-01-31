@@ -1,5 +1,6 @@
 package org.example.order.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.example.order.dto.OrderAddDTO;
@@ -27,11 +28,11 @@ public class OrderController {
   }
 
   @PostMapping
-  public ResponseEntity<OrderResponseDTO> add(@RequestBody OrderAddDTO orderAddDTO) {
+  public ResponseEntity<OrderResponseDTO> add(@Valid @RequestBody OrderAddDTO orderAddDTO) {
     Order createdOrder = orderService.addOrder(orderAddDTO);
 
-    OrderResponseDTO response = orderMapper.toDto(createdOrder);
+    OrderResponseDTO orderResponseDTO = orderMapper.toDto(createdOrder);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    return ResponseEntity.status(HttpStatus.CREATED).body(orderResponseDTO);
   }
 }
