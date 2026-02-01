@@ -59,9 +59,9 @@ class InventoryServiceImplTest {
   void createInventory_shouldCreateNewInventory_whenNotExists() {
     Product product = ProductInitializer.createProduct();
 
-    when(inventoryRepository.findByProductId(product.getId())).thenReturn(Optional.empty());
+    when(inventoryRepository.findByProductId(product.id())).thenReturn(Optional.empty());
 
-    cut.createInventory(product.getId(), product.getName(), product.getPrice());
+    cut.createInventory(product.id(), product.name(), product.price());
 
     ArgumentCaptor<Inventory> inventoryCaptor = ArgumentCaptor.forClass(Inventory.class);
 
@@ -69,9 +69,9 @@ class InventoryServiceImplTest {
 
     Inventory captured = inventoryCaptor.getValue();
 
-    assertEquals(product.getId(), captured.getProductId());
-    assertEquals(product.getName(), captured.getProductName());
-    assertEquals(product.getPrice(), captured.getProductPrice());
+    assertEquals(product.id(), captured.getProductId());
+    assertEquals(product.name(), captured.getProductName());
+    assertEquals(product.price(), captured.getProductPrice());
     assertEquals(0, captured.getQuantity());
   }
 

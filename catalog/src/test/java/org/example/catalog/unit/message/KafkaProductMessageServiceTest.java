@@ -65,9 +65,9 @@ class KafkaProductMessageServiceTest {
 
     ProductEvent productEvent = capturedProductEvent.getValue();
 
-    assertEquals(mockedProduct.getId(), productEvent.getProduct().getId());
-    assertEquals(mockedProduct.getName(), productEvent.getProduct().getName());
-    assertEquals(actionType, productEvent.getActionType());
+    assertEquals(mockedProduct.getId(), productEvent.product().id());
+    assertEquals(mockedProduct.getName(), productEvent.product().name());
+    assertEquals(actionType, productEvent.actionType());
   }
 
   @Test

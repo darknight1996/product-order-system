@@ -24,13 +24,10 @@ public class KafkaProductMessageService implements ProductMessageService {
       topics = "${app.kafka.topics.product-events}",
       groupId = "${spring.kafka.consumer.group-id}")
   public void productEvent(ProductEvent productEvent) {
-    log.info(
-        "Received ProductEvent: action={}, productId={}",
-        productEvent.getActionType(),
-        productEvent.getProduct().getId());
+    ActionType actionType = productEvent.actionType();
+    Product product = productEvent.product();
 
-    ActionType actionType = productEvent.getActionType();
-    Product product = productEvent.getProduct();
+    log.info("Received ProductEvent: action={}, productId={}", actionType, product.id());
 
     switch (actionType) {
       case ADD -> add(product);
@@ -42,20 +39,20 @@ public class KafkaProductMessageService implements ProductMessageService {
   }
 
   private void add(Product product) {
-    inventoryService.createInventory(product.getId(), product.getName(), product.getPrice());
+    inventoryService.createInventory(product.id(), product.name(), product.price());
 
-    log.info("Created new Inventory for productId={}", product.getId());
+    log.info("Created new Inventory for productId={}", product.id());
   }
 
   private void update(Product product) {
-    inventoryService.updateProductDetails(product.getId(), product.getName(), product.getPrice());
+    inventoryService.updateProductDetails(product.id(), product.name(), product.price());
 
-    log.info("Updated Inventory for productId={}", product.getId());
+    log.info("Updated Inventory for productId={}", product.id());
   }
 
   private void delete(Product product) {
-    inventoryService.deleteByProductId(product.getId());
+    inventoryService.deleteByProductId(product.id());
 
-    log.info("Deleted Inventory for productId={}", product.getId());
+    log.info("Deleted Inventory for productId={}", product.id());
   }
 }

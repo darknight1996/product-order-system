@@ -30,7 +30,7 @@ class KafkaProductMessageServiceTest {
     cut.productEvent(productEvent);
 
     verify(inventoryService, times(1))
-        .createInventory(product.getId(), product.getName(), product.getPrice());
+        .createInventory(product.id(), product.name(), product.price());
   }
 
   @Test
@@ -40,7 +40,7 @@ class KafkaProductMessageServiceTest {
 
     cut.productEvent(productEvent);
 
-    verify(inventoryService, times(1)).deleteByProductId(product.getId());
+    verify(inventoryService, times(1)).deleteByProductId(product.id());
   }
 
   @Test
@@ -51,6 +51,6 @@ class KafkaProductMessageServiceTest {
     cut.productEvent(productEvent);
 
     verify(inventoryService, times(1))
-        .updateProductDetails(product.getId(), product.getName(), product.getPrice());
+        .updateProductDetails(product.id(), product.name(), product.price());
   }
 }

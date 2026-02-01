@@ -11,10 +11,11 @@ public class ProductInitializer {
 
   public static Product createUpdatedProduct() {
     Product product = ProductInitializer.createProduct();
-    BigDecimal updatedPrice = product.getPrice().add(BigDecimal.valueOf(1000));
 
-    product.setName("updated name");
-    product.setPrice(updatedPrice);
+    BigDecimal updatedPrice = product.price().add(BigDecimal.valueOf(1000));
+    String updatedName = "updated name";
+
+    product = product.toBuilder().name(updatedName).price(updatedPrice).build();
 
     return product;
   }

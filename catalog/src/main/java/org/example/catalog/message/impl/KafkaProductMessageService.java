@@ -37,16 +37,21 @@ public class KafkaProductMessageService implements ProductMessageService {
   }
 
   private void sendEvent(Product product, ActionType actionType) {
-    ProductEvent event =
-        new ProductEvent(product.getId(), product.getName(), product.getPrice(), actionType);
+    ProductEvent event = createProductEvent(product, actionType);
 
     String messageKey = product.getId().toString();
 
     sendMessage(messageKey, event);
   }
 
+  private ProductEvent createProductEvent(Product product, ActionType actionType) {
+    return new ProductEvent(
+        new org.example.message.Product(product.getId(), product.getName(), product.getPrice()),
+        actionType);
+  }
+
   private void sendMessage(String key, ProductEvent event) {
-    log.info("Sending event {} for id: {}", event.getActionType(), key);
+    log.info("Sending event {} for id: {}", event.actionType(), key);
 
     kafkaTemplate
         .send(topicName, key, event)
